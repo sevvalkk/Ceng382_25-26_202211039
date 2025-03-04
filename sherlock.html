@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+</head>
+<body>        
+    <div id="time"></div>
+    <div class="container page start">
+            <div class="hat">
+                <div class="hat_ball"></div>
+                <div class="hat_top"></div>
+                <div class="text question" onclick="showHint()" title="Hint">?</div>
+                <div class="hat_strip"></div>
+                <div class="hat_bottom"></div>
+            </div>
+            <div class="hint">"SHER"lock</div>
+
+            <div class="containerMain">    
+                <div class="text font-effect-fire container3 ver1">I_AM</div>
+            
+                <div class="container2" title="Enter the mind palace!">  
+                    <div class="circle">
+                        <div class="inside" onclick="loginPage(); playAudio(); show()"></div>
+                    </div> 
+                    <div class="rectangle"></div>
+                </div>
+
+                <div class="text font-effect-fire container3 ver2">LOCKED</div>
+            </div>
+        </div>
+
+        <div class="container page login">
+            <audio autoplay loop>
+                <source src="audios/GameIsOn.mp3" type="audio/mpeg">
+            </audio>
+            <div class="text2">SHERLOCK_HOLMES</div>  
+            <div class="videoContainer">
+                <video autoplay loop muted>
+                    <source src="videos/video.mov">
+                </video>
+            </div>
+            <button class="btn" onclick="play_pause()" title="Play/Pause" >ıı</button>
+            <div class="clockContainer">
+                <button id="clockBackground" onclick="startPage(); stopAudio(); hide(); reverse()" title="Would you like to go back in time?"></button>
+                <div class="line line1"></div>
+                <div class="line line2"></div>
+                <div class="center"></div>
+            </div>   
+            <div class="texth" onclick="showLogin()"></div>
+            <div class="loginContainer">
+                <div class="container3 ver3">
+                    <div class="text3 font-effect-fire">GAME IS ON</div>
+                </div>
+                <form action="">
+                    <div class="containerInput">
+                        <div>
+                            <input type="text" placeholder="Username" required id="username">
+                        </div>
+                        <div>
+                            <input type="password" placeholder="Password" required id="password">
+                        </div>
+                    </div>
+                    <div class="loginBox">
+                        <button type="submit" onclick="logins()">LOGIN</button>
+                    </div>
+                    <div class="pass_sign">
+                        <a class="pass" href="#">Forgot Password?</a>
+                        <a class="signup" href="#">SIGN UP</a>
+                    </div>    
+                </form>
+            </div> 
+
+        </div>    
+
+    <script>
+        
+        function loginPage(){
+            if(document.querySelector('.start').classList.contains('return') == true)
+                document.querySelector('.start').classList.remove('return');
+
+            document.querySelector('.start').classList.add('hidden');
+            document.querySelector('.login').classList.remove('hidden');
+            document.querySelector('.hat').classList.add('hidden');
+            document.querySelector('.texth').classList.add('clicked');
+        }
+        
+        function playAudio() {
+            var audio = document.querySelector('audio');
+            audio.play();
+            audio.paused = false;
+        }
+        function stopAudio() {
+            var audio = document.querySelector('audio');
+            audio.paused = true;
+        }
+        
+        function show() {
+            document.querySelector('.text2').classList.add('clicked');
+            document.querySelector('.clockContainer').classList.add('clicked');
+            document.querySelector('.loginContainer').classList.add('clicked');
+            document.querySelector('.videoContainer').classList.add('clicked');
+            document.querySelector('.btn').classList.add('clicked');
+            
+        }
+        
+        function startPage(){
+            if(document.querySelector('.start').classList.contains('hidden') == true)
+                document.querySelector('.start').classList.remove('hidden');
+        
+            document.querySelector('.hat').classList.remove('hidden');
+            document.querySelector('.start').classList.add('return');
+            document.querySelector('.login').classList.add('hidden');
+            document.querySelector('.texth').classList.remove('clicked');
+        }
+        
+        function play_pause(){
+            var video = document.querySelector('video');
+            if(video.paused)
+            {
+                video.play();
+                document.querySelector('.videoContainer').classList.remove('paused');;
+            }    
+            else
+            {
+                video.pause();
+                document.querySelector('.videoContainer').classList.add('paused');
+            }
+        }
+
+        function reverse()
+        {            
+            if(document.querySelector('.line1').classList.contains('reversed') == false)
+            {
+                document.querySelector('.line1').classList.add('reversed');
+                document.querySelector('.line2').classList.add('reversed');
+            }
+            else
+            {
+                document.querySelector('.line1').classList.remove('reversed');
+                document.querySelector('.line2').classList.remove('reversed');
+                
+            }
+
+        }
+        
+        function hide() {
+            document.querySelector('.text2').classList.remove('clicked');
+            document.querySelector('.clockContainer').classList.remove('clicked');
+            document.querySelector('.loginContainer').classList.remove('clicked');
+            document.querySelector('.videoContainer').classList.remove('clicked');
+            document.querySelector('.btn').classList.remove('clicked');
+        }
+
+        function showHint(){
+            if(document.querySelector('.hint').classList.contains('clicked') == false)
+            {
+                document.querySelector('.hint').classList.add('clicked');
+            }
+            else
+            {
+                document.querySelector('.hint').classList.remove('clicked');                
+            }        
+        }
+
+        function showLogin(event) {
+        if (event.key === 'h' || event.key === 'H') {
+            const loginContainer = document.querySelector('.loginContainer');
+            loginContainer.classList.toggle('clicked');
+        }
+    }
+
+    // Listen for keydown
+    document.addEventListener('keydown', showLogin);
+
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const timeString = `${hours}:${minutes}:${seconds}`;
+        document.getElementById('time').textContent = timeString;
+    }
+
+    // Update every second
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call to show time immediately
+
+    var login=[];
+
+    function logins()
+    {
+        debugger;
+        console.log("Here");
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        login.push({ username: username, password: password });
+
+        console.log('All Login Attempts:', login);
+
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    }
+    
+    document.addEventListener('keydown', showLogin);
+
+    </script> 
+
+</body>
+</html>
+
+
+
+<!-- CHATGPT 
+
+ --------PROMPT:
+
+ <div>  
+        <div class="container page start">
+
+            <div class="containerMain">    
+                <div class="text font-effect-fire container3">I_AM</div>
+            
+                <div class="container2">  
+                    <div class="circle">
+                        <div class="inside"> 
+                            <div id="box" onclick="loginPage()">SHER</div>
+                        </div>
+                    </div> 
+                    <div class="rectangle"></div>
+                </div>
+
+                <div class="text font-effect-fire container4">LOCKED</div>
+            </div>
+        </div>
+
+        <div class="container page login">
+            <audio autoplay>
+                <source src="audios/GameIsOn.mp3" type="audio/mpeg">
+            </audio>
+            <div class="text2">SHERLOCK_HOLMES</div>  
+            <div class="clockContainer2">
+                <div class="clock"></div>
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="center"></div>
+            </div>   
+               
+        </div>
+
+    </div>
+    
+
+audio doesnt play automatically
+
+
+--------RESPONSE:
+ChatGPT:
+The issue with the audio not playing automatically is likely due to browser autoplay policies. Most modern browsers, including Chrome, Firefox, and Safari, have restrictions on autoplaying media, especially when it's not triggered by user interaction.
+Common reasons for autoplay not working:
+Muted Audio: Many browsers allow autoplay for videos and audio if they are muted. However, if the audio isn't muted, browsers often block autoplay.
+User Interaction Required: Some browsers require the user to interact with the page (click, hover, etc.) before allowing audio to play automatically.
+Autoplay Policy: Some browsers have stricter autoplay policies for non-muted media. For example, autoplay is allowed if it's on a page that has no user interaction and the audio is muted.
+Solutions:
+Ensure the Audio is Muted Initially (temporarily):
+
+You can try setting the muted attribute on the <audio> tag to see if autoplay works:
+html
+<audio autoplay muted>
+    <source src="audios/GameIsOn.mp3" type="audio/mpeg">
+</audio>
+This ensures that the browser allows the audio to play automatically. You can then unmute it using JavaScript later.
+
+Play Audio After User Interaction:
+If you don't want to mute the audio, you can trigger the audio playback after the user clicks or interacts with the page (e.g., after clicking a button). For example, trigger the audio when the #box element is clicked:
+html
+
+<div id="box" onclick="playAudio()">SHER</div>
+Then, in your JavaScript:
+
+function playAudio() {
+    var audio = document.querySelector('audio');
+    audio.play();
+} 
+    
+------------------------------------------------------------
+--------PROMPT:
+How can I make the first page disappear and the second page appear after clicking the button using HTML, CSS, and JavaScript?
+
+--------RESPONSE:
+You can easily create a two-page transition effect (where the first "page" disappears and the second "page" slides up, fades in, or just replaces it) using just HTML, CSS, and JavaScript (no jQuery needed).
+
+Two .page divs:
+    .page1 is the first page (the one you see initially).
+    .page2 is the second page (hidden off-screen at the start).
+    CSS transition handles the sliding up effect.
+    JavaScript (onclick) adds/removes classes to trigger the transition.
+
+    <script>
+        function showSecondPage() {
+            document.querySelector('.page1').classList.add('hidden'); // Fade out Page 1
+            document.querySelector('.page2').classList.add('visible'); // Slide in Page 2
+        }
+    </script>
+-->
