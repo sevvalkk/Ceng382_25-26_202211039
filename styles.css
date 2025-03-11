@@ -66,7 +66,7 @@ body{
 
 .loginBox button{
     font-family: 'Font', sans-serif;
-    color: rgb(255, 255, 255);
+    color: rgb(228, 83, 83);
     background: transparent;
     text-align: center;
     z-index: 1000;
@@ -170,7 +170,8 @@ input{
     animation-play-state: paused;
 }
 
-.btn{
+
+.bttn{
     position: absolute;
     top: 55%;
     left: 20%;
@@ -188,7 +189,7 @@ input{
     cursor: pointer;
 }
 
-.btn.clicked{
+.bttn.clicked{
     opacity:1;
 }
 
@@ -474,6 +475,66 @@ input{
     animation: slide-left 1s forwards;
 }
 
+.text4 {
+    font-family: 'Electrical', sans-serif;
+    text-align: center; 
+    margin-bottom: 20px; 
+}
+.text4.ver1{
+    font-size: 30px;
+}
+.text4.ver2{
+    font-size: 20px;
+}
+
+td:hover{
+    background-color: #8bb3df;
+}
+
+.classBox {
+    position: relative;
+    width: 1000px;
+    height: auto; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    margin: 50px auto; 
+    border-color: #000;
+    border-width: black;
+}
+
+.updateBox {
+    width: 150px;
+    height: 50px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    border-width: 2px;
+    opacity: 1;
+    font-family: 'Black', sans-serif;
+    text-align: center;
+    box-shadow: 0 0 20px #000;
+    transition: background-color 0.3s ease;
+}
+
+.updateBox:hover {
+    background-color: #5382b4;
+}
+
+.deleteBtn {
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.deleteBtn:hover {
+    color: darkred;
+}
+
 #time{
     width: 100px;
     height: 20px;
@@ -564,6 +625,7 @@ input{
     display: flex;   
     color: white;
 }
+
 
 /* ANIMATIONS */
 @keyframes vibrate {

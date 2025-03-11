@@ -42,7 +42,7 @@
                     <source src="videos/video.mov">
                 </video>
             </div>
-            <button class="btn" onclick="play_pause()" title="Play/Pause" >ıı</button>
+            <button class="bttn" onclick="play_pause()" title="Play/Pause" >ıı</button>
             <div class="clockContainer">
                 <button id="clockBackground" onclick="startPage(); stopAudio(); hide(); reverse()" title="Would you like to go back in time?"></button>
                 <div class="line line1"></div>
@@ -76,7 +76,8 @@
         </div>    
 
     <script>
-        
+
+
         function loginPage(){
             if(document.querySelector('.start').classList.contains('return') == true)
                 document.querySelector('.start').classList.remove('return');
@@ -102,7 +103,7 @@
             document.querySelector('.clockContainer').classList.add('clicked');
             document.querySelector('.loginContainer').classList.add('clicked');
             document.querySelector('.videoContainer').classList.add('clicked');
-            document.querySelector('.btn').classList.add('clicked');
+            document.querySelector('.bttn').classList.add('clicked');
             
         }
         
@@ -151,7 +152,7 @@
             document.querySelector('.clockContainer').classList.remove('clicked');
             document.querySelector('.loginContainer').classList.remove('clicked');
             document.querySelector('.videoContainer').classList.remove('clicked');
-            document.querySelector('.btn').classList.remove('clicked');
+            document.querySelector('.bttn').classList.remove('clicked');
         }
 
         function showHint(){
@@ -201,9 +202,15 @@
 
         document.getElementById('username').value = '';
         document.getElementById('password').value = '';
+        
+        if (username === 'admin' && password === 'admin') {
+            alert('Login Successful!');
+            window.location.href = "table.html";
+        }
     }
     
     document.addEventListener('keydown', showLogin);
+
 
     </script> 
 
