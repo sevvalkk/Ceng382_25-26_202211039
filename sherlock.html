@@ -63,9 +63,9 @@
                             <input type="password" placeholder="Password" required id="password">
                         </div>
                     </div>
-                    <div class="loginBox">
-                        <button type="submit" onclick="logins()">LOGIN</button>
-                    </div>
+                    <button class="loginBox" type="submit" onclick="logins()"> LOGIN </button>
+                        <!-- <button type="submit" onclick="logins()">LOGIN</button> -->
+                    <!-- </div> -->
                     <div class="pass_sign">
                         <a class="pass" href="#">Forgot Password?</a>
                         <a class="signup" href="#">SIGN UP</a>
@@ -193,8 +193,8 @@
 
     function logins()
     {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        let username = document.getElementById('username').value;
+        let password = document.getElementById('password').value;
 
         login.push({ username: username, password: password });
 
@@ -203,6 +203,8 @@
         document.getElementById('username').value = '';
         document.getElementById('password').value = '';
         
+        username= username.toLowerCase();
+        password= password.toLowerCase();
         if (username === 'admin' && password === 'admin') {
             alert('Login Successful!');
             window.location.href = "table.html";

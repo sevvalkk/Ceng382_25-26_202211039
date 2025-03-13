@@ -4,6 +4,12 @@ body{
     z-index: 0;
     overflow: hidden;
 }
+
+.afterLogin{
+    background-size: cover;
+    background-image: url('images/login.jpg');
+}
+
 .page{
     position: absolute;
     background-size: cover;
@@ -29,6 +35,8 @@ body{
     opacity:1;
 }
 
+
+/* LOGIN */
 .login{
     background-image: url('images/sherlock.jpg');
     position: absolute;
@@ -54,23 +62,15 @@ body{
     border-radius: 15px;
     border-width: 2px;
     opacity: 1;
-    font-family: 'Black', sans-serif;
+    font-family: 'Font', sans-serif;
     text-align: center;
     background-color: rgb(188, 188, 188,0.5);
     box-shadow: 0 0 20px #000;
+    color: white;
 }
 .loginBox:hover{
     background-color: rgba(9, 76, 105, 0.5);
     transition: 0.5s;
-}
-
-.loginBox button{
-    font-family: 'Font', sans-serif;
-    color: rgb(228, 83, 83);
-    background: transparent;
-    text-align: center;
-    z-index: 1000;
-    border-width: 0px;
 }
 
 .loginContainer{
@@ -477,6 +477,7 @@ input{
 
 .text4 {
     font-family: 'Electrical', sans-serif;
+    color: white;
     text-align: center; 
     margin-bottom: 20px; 
 }
@@ -491,6 +492,8 @@ td:hover{
     background-color: #8bb3df;
 }
 
+
+/* ADMIN */
 .classBox {
     position: relative;
     width: 1000px;
@@ -504,6 +507,19 @@ td:hover{
     border-width: black;
 }
 
+.classBox table {
+    width: 100%;
+    max-height: 300px; 
+    overflow-y: auto;
+    display: block;
+}
+
+.classBox thead, .classBox tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
 .updateBox {
     width: 150px;
     height: 50px;
@@ -514,7 +530,7 @@ td:hover{
     border-radius: 15px;
     border-width: 2px;
     opacity: 1;
-    font-family: 'Black', sans-serif;
+    font-family: 'Electrical', sans-serif;
     text-align: center;
     box-shadow: 0 0 20px #000;
     transition: background-color 0.3s ease;
@@ -535,10 +551,12 @@ td:hover{
     color: darkred;
 }
 
+
+/* TIME */
 #time{
     width: 100px;
-    height: 20px;
-    font-family: "Black", sans-serif;
+    height: 30px;
+    font-family: "Electrical", sans-serif;
     font-size: 25px;
     color: white;
     position: fixed;
@@ -546,6 +564,10 @@ td:hover{
     right: 10%;
     z-index: 1000;
     text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    border-width: 2px;
+    border-color: black;
 }
 
 /* FONTS */
@@ -755,3 +777,85 @@ td:hover{
         transform: rotate(360deg);
     }
 }
+
+
+/* CHATGPT */
+/* 
+PROMPT:
+
+ <form class="classBox" id="classForm">
+        <div class="mb-3">
+            <div class="text4 ver1">Class Information</div>
+        </div>
+        <div class="mb-3" style="width:400px; text-align: center">
+            <label for="className" class="text4 ver2">Class Name:</label>
+            <input type="text" class="form-control" style="opacity:0.75; border-width: 5px;" id="className" required>
+        </div>
+
+        <div class="mb-3" style="width:400px; text-align: center">
+            <label for="numPeople" class="text4 ver2" title="Sort">Number of People:</label>
+            <input type="number" class="form-control" style="opacity:0.75; border-width: 5px;" id="numPeople" required>
+        </div>
+
+        <div class="mb-3" style="width:400px; text-align: center;">
+            <label for="description" class="text4 ver2">Description:</label>
+            <textarea class="form-control" style="opacity:0.75; border-width: 5px;" id="description" required></textarea>
+        </div>
+
+        <button type="submit" class="updateBox" style="left:center">Update</button>
+    </form>
+
+    <form class="classBox" style="overflow-y: auto;">
+        <h2 class="text4 ver1">Class List</h2>
+        <table class="table table-striped" id="classTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Class Name</th>
+                    <th id="numPeopleHeader" style="cursor: pointer;">Number of People</th>
+                    <th>Description</th>
+                    <th>Delete</th> 
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </form>
+
+.classBox {
+    position: relative;
+    width: 1000px;
+    height: auto; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    margin: 50px auto; 
+    border-color: #000;
+    border-width: black;
+}
+
+i want to add a scroll bar at y direction for class entities
+
+
+OUTPUT:
+
+    .classBox table {
+        width: 100%;
+        max-height: 300px; 
+        overflow-y: auto;
+        display: block;
+    }
+
+    .classBox tbody {
+        display: block;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .classBox thead, .classBox tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+*/
