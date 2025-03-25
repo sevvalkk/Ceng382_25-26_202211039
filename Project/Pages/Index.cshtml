@@ -1,0 +1,76 @@
+﻿@page
+@model Project.Pages.IndexModel
+
+
+<div class="container">
+    <div class="row">
+        <!-- Left Column for Form -->
+        <div class="col-md-6">
+            <h2>Add or Edit Class</h2>
+
+            <form method="post">
+                <div class="form-group">
+                    <label for="ClassName">Class Name</label>
+                    <input type="text" id="ClassName" name="NewClass.ClassName" class="form-control" 
+                           value="@Model.NewClass.ClassName" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="StudentCount">Student Count</label>
+                    <input type="number" id="StudentCount" name="NewClass.StudentCount" class="form-control" 
+                           value="@Model.NewClass.StudentCount" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="Description">Description</label>
+                    <textarea id="Description" name="NewClass.Description" class="form-control" 
+                              required>@Model.NewClass.Description</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" asp-page-handler="Add">Add Class</button>
+                @if (Model.NewClass.Id != 0)
+                {
+                    <button type="submit" class="btn btn-warning" asp-page-handler="Update">Update Class</button>
+                }
+            </form>
+        </div>
+
+        <!-- Right Column for Table -->
+        <div class="col-md-6">
+            <h2>Class List</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Class Name</th>
+                        <th>Student Count</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var classInfo in IndexModel.Classes)
+                    {
+                        <tr>
+                            <td>@classInfo.Id</td>
+                            <td>@classInfo.ClassName</td>
+                            <td>@classInfo.StudentCount</td>
+                            <td>@classInfo.Description</td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-info" 
+                                            asp-page-handler="Edit" asp-route-id="@classInfo.Id">Edit</button>
+                                </form>
+                                <form method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger" 
+                                            asp-page-handler="Delete" asp-route-id="@classInfo.Id">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
