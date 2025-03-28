@@ -21,10 +21,7 @@ public class ErrorModel : PageModel
 
     public void OnGet()
     {
-        // if (Classes == null)
-        // {
-        //     Classes = new List<ClassInformationModel>();  // Initialize if null
-        // }
+        RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
     }
 }
 

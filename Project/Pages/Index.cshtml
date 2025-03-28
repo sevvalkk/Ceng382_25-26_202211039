@@ -2,43 +2,38 @@
 @model Project.Pages.IndexModel
 
 
-<div class="container">
-    <div class="row">
-        <!-- Left Column for Form -->
+<div class="container" style="height:500px; width:1000px; justify-content:center; margin-top: 15%; background-color: rgba(76, 154, 200, 0.5); border-radius:15px; box-shadow: 0 0 10px #000; overflow-y: auto;">
+    <div class="row" >
         <div class="col-md-6">
-            <h2>Add or Edit Class</h2>
+            <h2 class="text-center" style="font-family: Impact, sans-serif; text-decoration:underline; color:rgb(28, 108, 143)">-Class Information-</h2>
 
-            <form method="post">
+            <form method="post" class="container text-center" style="margin-top:30px;" >
+                <input type="hidden" asp-for="Class.Id" />
                 <div class="form-group">
                     <label for="ClassName">Class Name</label>
-                    <input type="text" id="ClassName" name="NewClass.ClassName" class="form-control" 
-                           value="@Model.NewClass.ClassName" required />
+                    <input type="text" id="ClassName" asp-for="Class.ClassName" class="form-control" required />
                 </div>
 
                 <div class="form-group">
                     <label for="StudentCount">Student Count</label>
-                    <input type="number" id="StudentCount" name="NewClass.StudentCount" class="form-control" 
-                           value="@Model.NewClass.StudentCount" required />
+                    <input type="number" id="StudentCount" asp-for="Class.StudentCount" class="form-control" required />
                 </div>
 
                 <div class="form-group">
                     <label for="Description">Description</label>
-                    <textarea id="Description" name="NewClass.Description" class="form-control" 
-                              required>@Model.NewClass.Description</textarea>
+                    <textarea id="Description" asp-for="Class.Description" class="form-control" required></textarea>
                 </div>
-
-                <button type="submit" class="btn btn-primary" asp-page-handler="Add">Add Class</button>
-                @if (Model.NewClass.Id != 0)
-                {
-                    <button type="submit" class="btn btn-warning" asp-page-handler="Update">Update Class</button>
-                }
+                <div style="display:flex; justify-content:center; margin-top:50px;">
+                    <button type="submit" class="btn btn-success" asp-page-handler="Add">Add Class</button>
+                    <button type="submit" class="btn btn-warning" asp-page-handler="Update">Update</button>
+                </div>
             </form>
+
         </div>
 
-        <!-- Right Column for Table -->
         <div class="col-md-6">
-            <h2>Class List</h2>
-            <table class="table">
+            <h2 style="font-family: Impact, sans-serif; text-decoration:underline; color:rgb(28, 108, 143);" class="text-center">-Class List-</h2>
+            <table class="table table-striped table-hover" style=" margin-top:30px;">
                 <thead>
                     <tr>
                         <th>Id</th>
@@ -49,22 +44,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var classInfo in IndexModel.Classes)
+                    @foreach (var c in Model.GetClasses())
                     {
                         <tr>
-                            <td>@classInfo.Id</td>
-                            <td>@classInfo.ClassName</td>
-                            <td>@classInfo.StudentCount</td>
-                            <td>@classInfo.Description</td>
+                            <td>@c.Id</td>
+                            <td>@c.ClassName</td>
+                            <td>@c.StudentCount</td>
+                            <td>@c.Description</td>
                             <td>
-                                <form method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-info" 
-                                            asp-page-handler="Edit" asp-route-id="@classInfo.Id">Edit</button>
-                                </form>
-                                <form method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger" 
-                                            asp-page-handler="Delete" asp-route-id="@classInfo.Id">Delete</button>
-                                </form>
+                                <div >
+
+                                    <form method="post" >
+                                        <button type="submit" class="btn btn-warning" asp-page-handler="Edit" asp-route-id="@c.Id">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post">
+                                        <button type="submit" class="btn btn-danger" asp-page-handler="Delete" asp-route-id="@c.Id">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -74,3 +74,5 @@
         </div>
     </div>
 </div>
+
+
