@@ -5,7 +5,6 @@ namespace Project.Models
 {
     public class ClassInformationModel
     {
-        private static int counter = 1;
         public int Id { get;  set; }
         [Required(ErrorMessage = "Class name is required!")]
         public string ClassName { get; set; }

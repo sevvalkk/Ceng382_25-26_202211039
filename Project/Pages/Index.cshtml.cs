@@ -10,13 +10,54 @@ namespace Project.Pages
     {
 
         public static List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
-        
+        private const int PageSize = 10;
+
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        [BindProperty(SupportsGet = true)]
+        public string Search { get; set; }
+
+        public int TotalPages { get; set; }
+        public List<ClassInformationTable> FilteredClasses { get; set;} 
         [BindProperty]
         public ClassInformationModel Class { get; set; } = new ClassInformationModel();
-
+        public IndexModel()
+        {
+            if (!Classes.Any())
+            {
+                SampleClasses();
+            }
+        }
+        
         public void OnGet()
         {
+            if (PageNumber <= 0)
+                PageNumber = 1;
+
+            var query = Classes.AsQueryable();
+
+            if (!string.IsNullOrEmpty(Search))
+            {
+                query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            int totalRecords = query.Count();
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+
+            FilteredClasses = query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .Select(c => new ClassInformationTable
+                {
+                    Id = c.Id,
+                    ClassName = c.ClassName,
+                    StudentCount = c.StudentCount,
+                    Description = c.Description
+                })
+                .ToList();
         }
+
 
         public IActionResult OnPostAdd()
         {
@@ -75,7 +116,21 @@ namespace Project.Pages
         {
             return Classes; 
         }
+        private void SampleClasses()
+        {
+            for (int i = 1; i <= 100; i++)
+            {
+                Classes.Add(new ClassInformationModel
+                {
+                    Id = i,
+                    ClassName = $"Class {i}",
+                    StudentCount = 10 + i,
+                    Description = $"Description for Class {i}"
+                });
+            }
+        }
     }
+    
 }
 
 
