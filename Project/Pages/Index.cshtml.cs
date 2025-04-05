@@ -61,10 +61,6 @@ namespace Project.Pages
 
         public IActionResult OnPostAdd()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
 
             int nextId = Classes.Count > 0 ? Classes.Max(c => c.Id) + 1 : 1;
             var newClass = new ClassInformationModel(Class.ClassName, Class.StudentCount, Class.Description)
@@ -73,7 +69,7 @@ namespace Project.Pages
             };
 
             Classes.Add(newClass);
-            return RedirectToPage();
+            return RedirectToPage(new { PageNumber = 1, Search = "" });
         }
 
 
@@ -118,17 +114,21 @@ namespace Project.Pages
         }
         private void SampleClasses()
         {
-            for (int i = 1; i <= 100; i++)
+            if (Classes.Count == 0) 
             {
-                Classes.Add(new ClassInformationModel
+                for (int i = 1; i <= 100; i++)
                 {
-                    Id = i,
-                    ClassName = $"Class {i}",
-                    StudentCount = 10 + i,
-                    Description = $"Description for Class {i}"
-                });
+                    Classes.Add(new ClassInformationModel
+                    {
+                        Id = i,
+                        ClassName = $"Class {i}",
+                        StudentCount = 10 + i,
+                        Description = $"Description for Class {i}"
+                    });
+                }
             }
         }
+
     }
     
 }
