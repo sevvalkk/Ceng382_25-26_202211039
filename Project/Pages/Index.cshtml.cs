@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Project.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Project.Helpers;
 
 namespace Project.Pages
 {
@@ -22,6 +23,11 @@ namespace Project.Pages
         public List<ClassInformationTable> FilteredClasses { get; set;} 
         [BindProperty]
         public ClassInformationModel Class { get; set; } = new ClassInformationModel();
+        
+        [BindProperty(SupportsGet = true)]
+        public List<string> SelectedColumns { get; set; } = new List<string>();
+
+
         public IndexModel()
         {
             if (!Classes.Any())
@@ -30,13 +36,27 @@ namespace Project.Pages
             }
         }
         
-        public void OnGet()
+        public void OnGet(string column)
         {
+            // Toggle column selection if necessary
+            if (!string.IsNullOrEmpty(column))
+            {
+                var columnsFromQuery = Request.Query["SelectedColumns"].ToString();
+                var currentSelection = columnsFromQuery?.Split(',').ToList() ?? new List<string>();
+
+                if (currentSelection.Contains(column))
+                    currentSelection.Remove(column);
+                else
+                    currentSelection.Add(column);
+
+                SelectedColumns = currentSelection;
+            }
+
             if (PageNumber <= 0)
                 PageNumber = 1;
 
+            // Apply search filter if search is not null or empty
             var query = Classes.AsQueryable();
-
             if (!string.IsNullOrEmpty(Search))
             {
                 query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
@@ -57,6 +77,10 @@ namespace Project.Pages
                 })
                 .ToList();
         }
+
+
+
+
 
 
         public IActionResult OnPostAdd()
@@ -128,6 +152,41 @@ namespace Project.Pages
                 }
             }
         }
+        
+        public IActionResult OnPostExportJson(string ExportMode)
+        {
+            List<ClassInformationTable> source;
+
+            // If there is a search term, use FilteredClasses, else use full Classes
+            if (!string.IsNullOrEmpty(Search) && FilteredClasses != null && FilteredClasses.Any())
+            {
+                source = FilteredClasses;
+            }
+            else
+            {
+                source = Classes.Select(c => new ClassInformationTable
+                {
+                    Id = c.Id,
+                    ClassName = c.ClassName,
+                    StudentCount = c.StudentCount,
+                    Description = c.Description
+                }).ToList();
+            }
+
+            if (SelectedColumns == null || !SelectedColumns.Any())
+            {
+                SelectedColumns = new List<string> { "Id", "ClassName", "StudentCount", "Description" };
+            }
+
+            string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json", $"export_{(string.IsNullOrEmpty(Search) ? "unfiltered" : "filtered")}_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+
+            Utils.Instance.ExportToJson(source, exportFilePath, SelectedColumns);
+
+            return RedirectToPage(new { ExportedFilePath = exportFilePath });
+        }
+
+
+
 
     }
     

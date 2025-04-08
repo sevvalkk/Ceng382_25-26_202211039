@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "lhWKoJPu6DxPo6Y0AmGyk1ml7Cpn24VecNiQfcapUb0=",
+  "Hash": "2+zuCKfR2sYVaxhPO1NbeOSA6QWQ1/Pky086ngtAtq4=",
   "Source": "Project",
   "BasePath": "_content/Project",
   "Mode": "Default",
@@ -1380,6 +1380,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "C:\\Users\\sevva\\Desktop\\ceng382webproject\\Ceng382_25-26_202211039\\Project\\wwwroot\\images\\nebula.jpg",
+      "SourceId": "Project",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\sevva\\Desktop\\ceng382webproject\\Ceng382_25-26_202211039\\Project\\wwwroot\\",
+      "BasePath": "_content/Project",
+      "RelativePath": "images/nebula#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "wse9ap3a4d",
+      "Integrity": "0E6LvFQdF8fUNy7CfD9drsmeLAggzmTcUl0P9XJoCqs=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\nebula.jpg"
     },
     {
       "Identity": "C:\\Users\\sevva\\Desktop\\ceng382webproject\\Ceng382_25-26_202211039\\Project\\wwwroot\\js\\site.js",
@@ -3194,6 +3215,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0="
+        }
+      ]
+    },
+    {
+      "Route": "images/nebula.jpg",
+      "AssetFile": "C:\\Users\\sevva\\Desktop\\ceng382webproject\\Ceng382_25-26_202211039\\Project\\wwwroot\\images\\nebula.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2901914"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"0E6LvFQdF8fUNy7CfD9drsmeLAggzmTcUl0P9XJoCqs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Apr 2024 13:50:41 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-0E6LvFQdF8fUNy7CfD9drsmeLAggzmTcUl0P9XJoCqs="
+        }
+      ]
+    },
+    {
+      "Route": "images/nebula.wse9ap3a4d.jpg",
+      "AssetFile": "C:\\Users\\sevva\\Desktop\\ceng382webproject\\Ceng382_25-26_202211039\\Project\\wwwroot\\images\\nebula.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2901914"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"0E6LvFQdF8fUNy7CfD9drsmeLAggzmTcUl0P9XJoCqs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Apr 2024 13:50:41 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "wse9ap3a4d"
+        },
+        {
+          "Name": "label",
+          "Value": "images/nebula.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-0E6LvFQdF8fUNy7CfD9drsmeLAggzmTcUl0P9XJoCqs="
         }
       ]
     },

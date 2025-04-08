@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "C:\\Users\\sevva\\Desktop\\ceng382webproject\\Ceng382_25-26_202211039\\Project\\wwwroot\\images\\nebula.jpg",
+      "PackagePath": "staticwebassets\\images\\nebula.jpg"
+    },
+    {
       "Id": "C:\\Users\\sevva\\Desktop\\ceng382webproject\\Ceng382_25-26_202211039\\Project\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },
