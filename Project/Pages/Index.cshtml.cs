@@ -153,39 +153,40 @@ namespace Project.Pages
             }
         }
         
-        public IActionResult OnPostExportJson(string ExportMode)
+        public IActionResult OnPostExportJson(string Search, int PageNumber, List<string> SelectedColumns)
         {
-            List<ClassInformationTable> source;
+            var query = Classes.AsQueryable();
 
-            // If there is a search term, use FilteredClasses, else use full Classes
-            if (!string.IsNullOrEmpty(Search) && FilteredClasses != null && FilteredClasses.Any())
+            if (!string.IsNullOrEmpty(Search))
             {
-                source = FilteredClasses;
+                query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
             }
-            else
-            {
-                source = Classes.Select(c => new ClassInformationTable
+
+            // Sayfalanan veriyi al (şu an tabloda görünenler)
+            var pagedData = query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .Select(c => new ClassInformationTable
                 {
                     Id = c.Id,
                     ClassName = c.ClassName,
                     StudentCount = c.StudentCount,
                     Description = c.Description
-                }).ToList();
-            }
+                })
+                .ToList();
 
             if (SelectedColumns == null || !SelectedColumns.Any())
             {
                 SelectedColumns = new List<string> { "Id", "ClassName", "StudentCount", "Description" };
             }
 
-            string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json", $"export_{(string.IsNullOrEmpty(Search) ? "unfiltered" : "filtered")}_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+            string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json",
+                $"export_page_{PageNumber}_{DateTime.Now:yyyyMMdd_HHmmss}.json");
 
-            Utils.Instance.ExportToJson(source, exportFilePath, SelectedColumns);
+            Utils.Instance.ExportToJson(pagedData, exportFilePath, SelectedColumns);
 
             return RedirectToPage(new { ExportedFilePath = exportFilePath });
         }
-
-
 
 
     }
@@ -627,4 +628,388 @@ public IActionResult OnPostUpdate()
 Fix Explanation:
 
 Instead of taking id as a parameter, it now directly updates Class.Id, which will be set from the form.
+
+
+
+
+
+PROMPT:______________________________
+@page
+@model Project.Pages.IndexModel
+
+    <div class="container" style="width:1000px; margin-top:50px;">
+        <div class="row" >
+            <div class="col-md-4 container" style="height:700px; width:500px; justify-content:center; background: linear-gradient(to right, rgb(31, 126, 167), rgb(76, 154, 200, 0.5)); border-radius:15px; box-shadow: 0 0 10px #000; overflow-y: auto;">
+                <h2 class="text-center" style="font-family: Impact, sans-serif; text-decoration:underline; color:rgb(232, 248, 255);">-Class Information-</h2>
+
+                <form method="post" class="container text-center" style="margin-top:40%;" >
+                    <input type="hidden" asp-for="Class.Id" />
+                    <div class="form-group">
+                        <label for="ClassName" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Class Name</label>
+                        <input type="text" id="ClassName" asp-for="Class.ClassName" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="StudentCount" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Student Count</label>
+                        <input type="number" id="StudentCount" asp-for="Class.StudentCount" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Description" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Description</label>
+                        <textarea id="Description" asp-for="Class.Description" class="form-control" style="max-height: 200px;" required></textarea>
+                    </div>
+                    <div style="display:flex; justify-content:center; margin-top:50px;">
+                        <button type="submit" class="btn btn-success" asp-page-handler="Add" style="font-size: 15px;">Add Class</button>
+                        <button type="submit" class="btn btn-warning" asp-page-handler="Update" style="font-size: 15px">Update</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="col-md-7" style="height:700px; justify-content:center; background: linear-gradient(to right, rgb(76, 154, 200, 0.5), rgb(31, 126, 167)); border-radius:15px; box-shadow: 0 0 10px #000; overflow-y: auto;">
+                <h2 style="font-family: Impact, sans-serif; text-decoration:underline; color:rgb(232, 248, 255);" class="text-center">-Class List-</h2>
+                
+                <form method="get" class="form-inline" style="margin-top:20px; display:flex; justify-content:center;">
+                    <div class="form-group">
+                        <label for="Search" class="mr-2"></label>
+                        <input type="text" id="Search" name="Search" class="form-control" placeholder="Class Name" value="@Model.Search" />
+                        <button type="submit" class="btn btn-info ml-2" style="background-color:rgb(28, 108, 143);">Filter</button>
+                    </div>
+                </form>
+                
+                <table class="table table-striped table-hover" style=" margin-top:30px; ">
+                    <thead>
+                        <tr style="font-family: 'Times New Roman', Times, serif; font-size: 18px; color:rgb(232, 248, 255);">
+                            <th>
+                                <!-- Form for toggling column selection for ClassName -->
+                                <form method="get">
+                                    <input type="hidden" name="Search" value="@Model.Search" />
+                                    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                                    <button name="column" value="ClassName" class="btn @((Model.SelectedColumns.Contains("ClassName") ? "btn-info" : "btn-outline-secondary"))">Class Name</button>
+                                </form>
+                            </th>
+                            <th>
+                                <!-- Form for toggling column selection for StudentCount -->
+                                <form method="get">
+                                    <input type="hidden" name="Search" value="@Model.Search" />
+                                    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                                    <button name="column" value="StudentCount" class="btn @((Model.SelectedColumns.Contains("StudentCount") ? "btn-info" : "btn-outline-secondary"))">Student Count</button>
+                                </form>
+                            </th>
+                            <th>
+                                <!-- Form for toggling column selection for Description -->
+                                <form method="get">
+                                    <input type="hidden" name="Search" value="@Model.Search" />
+                                    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                                    <button name="column" value="Description" class="btn @((Model.SelectedColumns.Contains("Description") ? "btn-info" : "btn-outline-secondary"))">Description</button>
+                                </form>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        @if (Model.FilteredClasses != null && Model.FilteredClasses.Any())
+                        {
+                            @foreach (var c in Model.FilteredClasses)
+                            {
+                                <tr>
+                                    <td>@c.ClassName</td>
+                                    <td>@c.StudentCount</td>
+                                    <td>@c.Description</td>
+                                    <td>
+                                        <div>
+                                            <form method="post">
+                                                <button type="submit" class="btn btn-warning" asp-page-handler="Edit" asp-route-id="@c.Id">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post">
+                                                <button type="submit" class="btn btn-danger" asp-page-handler="Delete" asp-route-id="@c.Id">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">No classes found.</td>
+                            </tr>
+                        }
+
+
+                    </tbody>
+                </table>
+
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center">
+                    @if (Model.PageNumber > 1)
+                    {
+                        <a style="color:rgb(232, 248, 255);" href="?PageNumber=@(Model.PageNumber - 1)&Search=@Model.Search" class="btn btn-link">Previous</a>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <a style="color:rgb(232, 248, 255);"href="?PageNumber=@i&Search=@Model.Search" class="btn btn-link @((Model.PageNumber == i) ? "active" : "")">@i</a>
+                    }
+
+                    @if (Model.PageNumber < Model.TotalPages)
+                    {
+                        <a style="color:rgb(232, 248, 255);"href="?PageNumber=@(Model.PageNumber + 1)&Search=@Model.Search" class="btn btn-link">Next</a>
+                    }
+                </div>
+
+            </div>
+           <form method="post" style="margin-top:20px; display:flex; justify-content:center;">
+                @foreach (var col in Model.SelectedColumns)
+                {
+                    <input type="hidden" name="SelectedColumns" value="@col" />
+                }
+                <input type="hidden" name="Search" value="@Model.Search" />
+
+                <!-- Single export button that handles both filtered and unfiltered data -->
+                <button type="submit" asp-page-handler="ExportJson" class="btn btn-primary">
+                    Export @((string.IsNullOrEmpty(Model.Search)) ? "Unfiltered" : "Filtered")
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+
+
+ public IActionResult OnPostExportJson(string ExportMode)
+        {
+            List<ClassInformationTable> source;
+
+            // If there is a search term, use FilteredClasses, else use full Classes
+            if (!string.IsNullOrEmpty(Search) && FilteredClasses != null && FilteredClasses.Any())
+            {
+                source = FilteredClasses;
+            }
+            else
+            {
+                source = Classes.Select(c => new ClassInformationTable
+                {
+                    Id = c.Id,
+                    ClassName = c.ClassName,
+                    StudentCount = c.StudentCount,
+                    Description = c.Description
+                }).ToList();
+            }
+
+            if (SelectedColumns == null || !SelectedColumns.Any())
+            {
+                SelectedColumns = new List<string> { "Id", "ClassName", "StudentCount", "Description" };
+            }
+
+            string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json", $"export_{(string.IsNullOrEmpty(Search) ? "unfiltered" : "filtered")}_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+
+            Utils.Instance.ExportToJson(source, exportFilePath, SelectedColumns);
+
+            return RedirectToPage(new { ExportedFilePath = exportFilePath });
+        }
+
+
+public void OnGet(string column)
+        {
+            // Toggle column selection if necessary
+            if (!string.IsNullOrEmpty(column))
+            {
+                var columnsFromQuery = Request.Query["SelectedColumns"].ToString();
+                var currentSelection = columnsFromQuery?.Split(',').ToList() ?? new List<string>();
+
+                if (currentSelection.Contains(column))
+                    currentSelection.Remove(column);
+                else
+                    currentSelection.Add(column);
+
+                SelectedColumns = currentSelection;
+            }
+
+            if (PageNumber <= 0)
+                PageNumber = 1;
+
+            // Apply search filter if search is not null or empty
+            var query = Classes.AsQueryable();
+            if (!string.IsNullOrEmpty(Search))
+            {
+                query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            int totalRecords = query.Count();
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+
+            FilteredClasses = query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .Select(c => new ClassInformationTable
+                {
+                    Id = c.Id,
+                    ClassName = c.ClassName,
+                    StudentCount = c.StudentCount,
+                    Description = c.Description
+                })
+                .ToList();
+        }
+
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+
+namespace Project.Helpers
+{
+    public class Utils
+    {
+        private static readonly Lazy<Utils> _instance = new Lazy<Utils>(() => new Utils());
+
+        public static Utils Instance => _instance.Value;
+
+        public void ExportToJson<T>(List<T> data, string filePath, List<string> selectedColumns = null)
+        {
+            var filteredData = new List<Dictionary<string, object>>();
+
+            foreach (var item in data)
+            {
+                var dict = new Dictionary<string, object>();
+
+                // If no specific columns are selected, export all properties
+                if (selectedColumns == null || selectedColumns.Count == 0)
+                {
+                    foreach (var property in item.GetType().GetProperties())
+                    {
+                        dict[property.Name] = property.GetValue(item);
+                    }
+                }
+                else
+                {
+                    // Export only selected columns
+                    foreach (var property in item.GetType().GetProperties())
+                    {
+                        if (selectedColumns.Contains(property.Name))
+                        {
+                            dict[property.Name] = property.GetValue(item);
+                        }
+                    }
+                }
+
+                filteredData.Add(dict);
+            }
+
+            var json = JsonSerializer.Serialize(filteredData, new JsonSerializerOptions { WriteIndented = true });
+
+            var directory = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllText(filePath, json);
+        }
+    }
+}
+
+
+sayfa ilk fotoğraftaki gibi, filtreleyince de sonraki gibi oluyor. ben istiyorum ki sadece tabloda görünen classlar export etsin
+
+
+
+
+
+
+RESPONSE:______________________________
+Anladım! Yani senin isteğin şu:
+
+> **Filtrelenmiş olsa bile**, sadece **görüntülenen sayfadaki sınıflar** (yani tabloda o anda görünen kayıtlar) `Export` butonuna basıldığında `JSON` olarak dışa aktarılmalı.
+
+### 🔧 Şu Anki Durum
+Senin `OnPostExportJson` handler'ın **tüm filtrelenmiş sonuçları** (yani `FilteredClasses`) alıp hepsini export ediyor.
+
+Ama **sen sadece sayfalama sonucu tabloda görünenleri** export etmek istiyorsun.
+
+---
+
+### ✅ Çözüm
+
+Senin `FilteredClasses` zaten sayfalanmış verileri tutuyor. Yani `OnGet` içinde `.Skip(...).Take(...)` yaptığın yerde sayfalanan veri orada oluşuyor.
+
+Ama `OnPostExportJson` metodunda `FilteredClasses`'ı kullanman için bu listenin yeniden elde edilmesi gerekiyor, çünkü `OnPost` çağrısı sırasında `FilteredClasses` dolu olmayabilir (sayfalamayı da hesaba katmak lazım).
+
+Bu yüzden önerim:
+
+1. `OnPostExportJson` metodunu **gösterilen tablo verisi kadar veriyle sınırlayacak** hale getir.
+2. Gerekirse, `PageNumber`, `Search`, ve `SelectedColumns` bilgilerini formdan da gönder.
+
+### 🛠️ Adım Adım Değişiklik
+
+#### 1. Export butonundaki forma gerekli `PageNumber` bilgisini de ekle:
+
+<form method="post" style="margin-top:20px; display:flex; justify-content:center;">
+    @foreach (var col in Model.SelectedColumns)
+    {
+        <input type="hidden" name="SelectedColumns" value="@col" />
+    }
+    <input type="hidden" name="Search" value="@Model.Search" />
+    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+
+    <button type="submit" asp-page-handler="ExportJson" class="btn btn-primary">
+        Export @((string.IsNullOrEmpty(Model.Search)) ? "Unfiltered" : "Filtered")
+    </button>
+</form>
+```
+
+#### 2. `OnPostExportJson` metodunu güncelle (yalnızca mevcut sayfadaki kayıtlar alınacak):
+
+public IActionResult OnPostExportJson(string Search, int PageNumber, List<string> SelectedColumns)
+{
+    var query = Classes.AsQueryable();
+
+    if (!string.IsNullOrEmpty(Search))
+    {
+        query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // Sayfalanan veriyi al (şu an tabloda görünenler)
+    var pagedData = query
+        .Skip((PageNumber - 1) * PageSize)
+        .Take(PageSize)
+        .Select(c => new ClassInformationTable
+        {
+            Id = c.Id,
+            ClassName = c.ClassName,
+            StudentCount = c.StudentCount,
+            Description = c.Description
+        })
+        .ToList();
+
+    if (SelectedColumns == null || !SelectedColumns.Any())
+    {
+        SelectedColumns = new List<string> { "Id", "ClassName", "StudentCount", "Description" };
+    }
+
+    string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json",
+        $"export_page_{PageNumber}_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+
+    Utils.Instance.ExportToJson(pagedData, exportFilePath, SelectedColumns);
+
+    return RedirectToPage(new { ExportedFilePath = exportFilePath });
+}
+
+
+### ✅ Artık Ne Oldu?
+
+- Filtre varsa: uygulanır.
+- Sayfa numarası alınır: sadece o sayfadaki kayıtlar alınır.
+- `Export` işlemi sadece tabloda görünen kayıtları içerir 🎯
+
+
+
 */
