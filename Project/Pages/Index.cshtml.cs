@@ -4,188 +4,88 @@ using Project.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Project.Helpers;
+using System.Text.Json;
 
 namespace Project.Pages
 {
     public class IndexModel : PageModel
     {
 
-        public static List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
-        private const int PageSize = 10;
-
-        [BindProperty(SupportsGet = true)]
-        public int PageNumber { get; set; } = 1;
-
-        [BindProperty(SupportsGet = true)]
-        public string Search { get; set; }
-
-        public int TotalPages { get; set; }
-        public List<ClassInformationTable> FilteredClasses { get; set;} 
         [BindProperty]
-        public ClassInformationModel Class { get; set; } = new ClassInformationModel();
-        
-        [BindProperty(SupportsGet = true)]
-        public List<string> SelectedColumns { get; set; } = new List<string>();
+        public string Username { get; set; }
 
+        [BindProperty]
+        public string Password { get; set; }
 
-        public IndexModel()
+        public string ErrorMessage { get; set; }
+
+        public IActionResult OnPost()
         {
-            if (!Classes.Any())
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "users.json");
+            var users = JsonSerializer.Deserialize<List<User>>(System.IO.File.ReadAllText(filePath));
+
+            var user = users.FirstOrDefault(u => u.Username == Username && u.Password == Password && u.IsActive);
+
+            if (user != null)
             {
-                SampleClasses();
-            }
-        }
-        
-        public void OnGet(string column)
-        {
-            // Toggle column selection if necessary
-            if (!string.IsNullOrEmpty(column))
-            {
-                var columnsFromQuery = Request.Query["SelectedColumns"].ToString();
-                var currentSelection = columnsFromQuery?.Split(',').ToList() ?? new List<string>();
+                var token = Guid.NewGuid().ToString();
+                var sessionId = HttpContext.Session.Id;
 
-                if (currentSelection.Contains(column))
-                    currentSelection.Remove(column);
-                else
-                    currentSelection.Add(column);
+                // Set session
+                HttpContext.Session.SetString("username", user.Username);
+                HttpContext.Session.SetString("token", token);
+                HttpContext.Session.SetString("session_id", sessionId);
 
-                SelectedColumns = currentSelection;
-            }
-
-            if (PageNumber <= 0)
-                PageNumber = 1;
-
-            // Apply search filter if search is not null or empty
-            var query = Classes.AsQueryable();
-            if (!string.IsNullOrEmpty(Search))
-            {
-                query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
-            }
-
-            int totalRecords = query.Count();
-            TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
-
-            FilteredClasses = query
-                .Skip((PageNumber - 1) * PageSize)
-                .Take(PageSize)
-                .Select(c => new ClassInformationTable
+                // Set cookie
+                CookieOptions options = new CookieOptions
                 {
-                    Id = c.Id,
-                    ClassName = c.ClassName,
-                    StudentCount = c.StudentCount,
-                    Description = c.Description
-                })
-                .ToList();
-        }
+                    Expires = DateTime.Now.AddMinutes(30),
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                };
 
+                Response.Cookies.Append("username", user.Username, options);
+                Response.Cookies.Append("token", token, options);
+                Response.Cookies.Append("session_id", sessionId, options);
 
-
-
-
-
-        public IActionResult OnPostAdd()
-        {
-
-            int nextId = Classes.Count > 0 ? Classes.Max(c => c.Id) + 1 : 1;
-            var newClass = new ClassInformationModel(Class.ClassName, Class.StudentCount, Class.Description)
-            {
-                Id = nextId 
-            };
-
-            Classes.Add(newClass);
-            return RedirectToPage(new { PageNumber = 1, Search = "" });
-        }
-
-
-        public IActionResult OnPostEdit(int id)
-        {
-            var classToEdit = Classes.FirstOrDefault(c => c.Id == id);
-            if (classToEdit != null)
-            {
-                Class.Id = classToEdit.Id;
-                Class.ClassName = classToEdit.ClassName;
-                Class.StudentCount = classToEdit.StudentCount;
-                Class.Description = classToEdit.Description;
-            }
-            return Page(); 
-        }
-
-        public IActionResult OnPostDelete(int id)
-        {
-            var classToDelete = Classes.FirstOrDefault(c => c.Id == id);
-            if (classToDelete != null)
-            {
-                Classes.Remove(classToDelete);
+                return RedirectToPage("/Table"); // redirect to class table page
             }
 
-            return RedirectToPage(); 
+            ErrorMessage = "Username or password is incorrect.";
+            return Page();
         }
-        public IActionResult OnPostUpdate()
+
+        public IActionResult OnGet()
         {
-            var UpdatedClass = Classes.FirstOrDefault(c => c.Id == Class.Id);
-            if (UpdatedClass != null)
+            string sessionUsername = HttpContext.Session.GetString("username");
+            string sessionToken = HttpContext.Session.GetString("token");
+            string sessionId = HttpContext.Session.GetString("session_id");
+
+            string cookieUsername = Request.Cookies["username"];
+            string cookieToken = Request.Cookies["token"];
+            string cookieSessionId = Request.Cookies["session_id"];
+
+            if (sessionUsername == null || sessionToken == null || sessionId == null ||
+                cookieUsername == null || cookieToken == null || cookieSessionId == null ||
+                sessionUsername != cookieUsername || sessionToken != cookieToken || sessionId != cookieSessionId)
             {
-                UpdatedClass.ClassName = Class.ClassName;
-                UpdatedClass.StudentCount = Class.StudentCount;
-                UpdatedClass.Description = Class.Description;
+                TempData["Error"] = "Unauthorized access.";
             }
 
-            return RedirectToPage(); 
+            // Proceed with page logic
+            return Page();
         }
-        public List<ClassInformationModel> GetClasses()
+
+        public IActionResult OnPostLogout()
         {
-            return Classes; 
-        }
-        private void SampleClasses()
-        {
-            if (Classes.Count == 0) 
-            {
-                for (int i = 1; i <= 100; i++)
-                {
-                    Classes.Add(new ClassInformationModel
-                    {
-                        Id = i,
-                        ClassName = $"Class {i}",
-                        StudentCount = 10 + i,
-                        Description = $"Description for Class {i}"
-                    });
-                }
-            }
-        }
-        
-        public IActionResult OnPostExportJson(string Search, int PageNumber, List<string> SelectedColumns)
-        {
-            var query = Classes.AsQueryable();
+            HttpContext.Session.Clear();
 
-            if (!string.IsNullOrEmpty(Search))
-            {
-                query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
-            }
+            Response.Cookies.Delete("username");
+            Response.Cookies.Delete("token");
+            Response.Cookies.Delete("session_id");
 
-            // Sayfalanan veriyi al (şu an tabloda görünenler)
-            var pagedData = query
-                .Skip((PageNumber - 1) * PageSize)
-                .Take(PageSize)
-                .Select(c => new ClassInformationTable
-                {
-                    Id = c.Id,
-                    ClassName = c.ClassName,
-                    StudentCount = c.StudentCount,
-                    Description = c.Description
-                })
-                .ToList();
-
-            if (SelectedColumns == null || !SelectedColumns.Any())
-            {
-                SelectedColumns = new List<string> { "Id", "ClassName", "StudentCount", "Description" };
-            }
-
-            string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json",
-                $"export_page_{PageNumber}_{DateTime.Now:yyyyMMdd_HHmmss}.json");
-
-            Utils.Instance.ExportToJson(pagedData, exportFilePath, SelectedColumns);
-
-            return RedirectToPage(new { ExportedFilePath = exportFilePath });
+            return RedirectToPage("/Index");
         }
 
 

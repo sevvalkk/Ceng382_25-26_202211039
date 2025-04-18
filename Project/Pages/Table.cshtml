@@ -1,0 +1,289 @@
+@page
+@model Project.Pages.TableModel
+
+
+    <div class="container" style="width:1000px; margin-top:50px;">
+        <div class="row" >
+            <div class="col-md-4 container" style="height:700px; width:500px; justify-content:center; background: linear-gradient(to right, rgb(31, 126, 167), rgb(76, 154, 200, 0.5)); border-radius:15px; box-shadow: 0 0 10px #000; overflow-y: auto;">
+                <h2 class="text-center" style="font-family: Impact, sans-serif; text-decoration:underline; color:rgb(232, 248, 255);">-Class Information-</h2>
+
+                <form method="post" class="container text-center" style="margin-top:40%;" >
+                    <input type="hidden" asp-for="Class.Id" />
+                    <div class="form-group">
+                        <label for="ClassName" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Class Name</label>
+                        <input type="text" id="ClassName" asp-for="Class.ClassName" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="StudentCount" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Student Count</label>
+                        <input type="number" id="StudentCount" asp-for="Class.StudentCount" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Description" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Description</label>
+                        <textarea id="Description" asp-for="Class.Description" class="form-control" style="max-height: 200px;" required></textarea>
+                    </div>
+                    <div style="display:flex; justify-content:center; margin-top:50px;">
+                        <button type="submit" class="btn btn-success" asp-page-handler="Add" style="font-size: 15px;">Add Class</button>
+                        <button type="submit" class="btn btn-warning" asp-page-handler="Update" style="font-size: 15px">Update</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="col-md-7" style="height:700px; justify-content:center; background: linear-gradient(to right, rgb(76, 154, 200, 0.5), rgb(31, 126, 167)); border-radius:15px; box-shadow: 0 0 10px #000; overflow-y: auto;">
+                <h2 style="font-family: Impact, sans-serif; text-decoration:underline; color:rgb(232, 248, 255);" class="text-center">-Class List-</h2>
+                
+                <form method="get" class="form-inline" style="margin-top:20px; display:flex; justify-content:center;">
+                    <div class="form-group">
+                        <label for="Search" class="mr-2"></label>
+                        <input type="text" id="Search" name="Search" class="form-control" placeholder="Class Name" value="@Model.Search" />
+                        <button type="submit" class="btn btn-info ml-2" style="background-color:rgb(28, 108, 143);">Filter</button>
+                    </div>
+                </form>
+                
+                <table class="table table-striped table-hover" style=" margin-top:30px;">
+                    <thead>
+                        <tr style="font-family: 'Times New Roman', Times, serif; font-size: 18px; color:rgb(232, 248, 255); ">
+                            <th>
+                                <form method="get">
+                                    <input type="hidden" name="Search" value="@Model.Search" />
+                                    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                                    <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
+                                    <button name="column" value="ClassName" class="btn @((Model.SelectedColumns.Contains("ClassName") ? "btn-info" : "btn-outline-light"))">Class Name</button>
+                                </form>
+                            </th>
+                            <th>
+                                <form method="get">
+                                    <input type="hidden" name="Search" value="@Model.Search" />
+                                    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                                    <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
+                                    <button name="column" value="StudentCount" class="btn @((Model.SelectedColumns.Contains("StudentCount") ? "btn-info" : "btn-outline-light"))">Student Count</button>
+                                </form>
+                            </th>
+                            <th>
+                                <form method="get">
+                                    <input type="hidden" name="Search" value="@Model.Search" />
+                                    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                                    <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
+                                    <button name="column" value="Description" class="btn @((Model.SelectedColumns.Contains("Description") ? "btn-info" : "btn-outline-light"))">Description</button>
+                                </form>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.FilteredClasses != null && Model.FilteredClasses.Any())
+                        {
+                            @foreach (var c in Model.FilteredClasses)
+                            {
+                                <tr style="color:rgb(232, 248, 255);">
+                                    <td>@c.ClassName</td>
+                                    <td>@c.StudentCount</td>
+                                    <td>@c.Description</td>
+                                    <td>
+                                        <div>
+                                            <form method="post">
+                                                <button type="submit" class="btn btn-warning" asp-page-handler="Edit" asp-route-id="@c.Id">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post">
+                                                <button type="submit" class="btn btn-danger" asp-page-handler="Delete" asp-route-id="@c.Id">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">No classes found.</td>
+                            </tr>
+                        }
+
+
+                    </tbody>
+                </table>
+
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center">
+                    @if (Model.PageNumber > 1)
+                    {
+                        <a style="color:rgb(232, 248, 255);" href="?PageNumber=@(Model.PageNumber - 1)&Search=@Model.Search" class="btn btn-link">Previous</a>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <a style="color:rgb(232, 248, 255);"href="?PageNumber=@i&Search=@Model.Search" class="btn btn-link @((Model.PageNumber == i) ? "active" : "")">@i</a>
+                    }
+
+                    @if (Model.PageNumber < Model.TotalPages)
+                    {
+                        <a style="color:rgb(232, 248, 255);"href="?PageNumber=@(Model.PageNumber + 1)&Search=@Model.Search" class="btn btn-link">Next</a>
+                    }
+                </div>
+
+            </div>
+           <form method="post" style="margin-top:20px; display:flex; justify-content:center;">
+                @foreach (var col in Model.SelectedColumns)
+                {
+                    <input type="hidden" name="SelectedColumns" value="@col" />
+                }
+                <input type="hidden" name="Search" value="@Model.Search" />
+                <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+
+                <button type="submit" asp-page-handler="ExportJson" class="btn btn-primary" style="font-family: 'Times New Roman'; background-color:rgb(39, 126, 163, 0.8); height:35px; width:100px; font-size: 20px; box-shadow: 0 0 10px #000; border-radius: 5px;">
+                    Export
+                </button>
+            </form>
+
+
+        </div>
+    </div>
+
+
+
+
+@* 
+    AI-----------------
+    PROMPT:_________________________________
+
+      Failed to determine the https port for redirect.
+PageNumber: 0, Search: , TotalRecords: 100, TotalPages: 10
+PageNumber: 0, Search: , TotalRecords: 100, TotalPages: 10
+PageNumber: 0, Search: , TotalRecords: 100, TotalPages: 10
+PageNumber: 0, Search: , TotalRecords: 100, TotalPages: 10
+
+       public void OnGet(int page)
+        {
+            PageNumber = page;
+            var query = Classes.AsQueryable();
+            
+            if (!string.IsNullOrEmpty(Search))
+            {
+                query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            int totalRecords = query.Count();
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+            
+            FilteredClasses = query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .Select(c => new ClassInformationTable
+                {
+                    Id = c.Id,
+                    ClassName = c.ClassName,
+                    StudentCount = c.StudentCount,
+                    Description = c.Description
+                })
+                .ToList();
+
+            Console.WriteLine($"PageNumber: {PageNumber}, Search: {Search}, TotalRecords: {totalRecords}, TotalPages: {TotalPages}");
+        }
+
+    sadece bu kodda assign edilen page değerine sayfa gidebiliyor. yani bu demek oluyor ki benim arayüzde tıkladığım pagenumber'ı onget methodu algılamıyor. çünkü önceki kodda page=1 diye yazmıştım ve page 1 e gitmişti, şimdi bir şey yazmadım o yüzden sıfıra gidiyor gibi görünüyor
+
+    RESPONSE:______________________________
+    Aynen, süpersin! Tespit tamamen doğru ✅
+    Seni adım adım, en sağlam ve kolay yönetilebilir olan **query string tabanlı paging** yapısına geçiriyorum. Böylece sayfa numarası düzgün şekilde alınacak, sayfalar arasında geçiş sorunsuz olacak.
+    ### 🧩 1. `@page` tanımını sadeleştir
+
+    #### 🔧 `Index.cshtml` dosyanın en başı şu şekilde olacak:
+
+    ```cshtml
+    @page
+    @model Project.Pages.IndexModel
+    ```
+
+    > ❌ Yani `@page "{page?}"` kısmını kaldırıyoruz. Çünkü `page` artık URL route’undan değil, query string üzerinden alınacak.
+    ### 🧩 2. `PageNumber` değişkenini tanımla (Model tarafında)
+
+    #### 🔧 `Index.cshtml.cs`:
+
+    ```csharp
+    [BindProperty(SupportsGet = true)]
+    public int PageNumber { get; set; } = 1;
+
+    [BindProperty(SupportsGet = true)]
+    public string Search { get; set; }
+
+    public List<ClassInformationTable> FilteredClasses { get; set; }
+
+    public int TotalPages { get; set; }
+
+    public int PageSize { get; set; } = 10;
+    ```
+
+    ### 🧩 3. `OnGet()` metodunu sadeleştir
+
+    ```csharp
+    public void OnGet()
+    {
+        if (PageNumber <= 0)
+            PageNumber = 1;
+
+        var query = Classes.AsQueryable();
+
+        if (!string.IsNullOrEmpty(Search))
+        {
+            query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
+        }
+
+        int totalRecords = query.Count();
+        TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+
+        FilteredClasses = query
+            .Skip((PageNumber - 1) * PageSize)
+            .Take(PageSize)
+            .Select(c => new ClassInformationTable
+            {
+                Id = c.Id,
+                ClassName = c.ClassName,
+                StudentCount = c.StudentCount,
+                Description = c.Description
+            })
+            .ToList();
+
+        Console.WriteLine($"PageNumber: {PageNumber}, Search: {Search}, TotalRecords: {totalRecords}, TotalPages: {TotalPages}");
+    }
+    ```
+
+    ---
+
+    ### 🧩 4. Linkleri `?PageNumber=` olarak düzelt
+
+    #### 🔧 Pagination kısmı:
+
+    ```cshtml
+    <div class="d-flex justify-content-center">
+        @if (Model.PageNumber > 1)
+        {
+            <a href="?PageNumber=@(Model.PageNumber - 1)&Search=@Model.Search" class="btn btn-link">Previous</a>
+        }
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="?PageNumber=@i&Search=@Model.Search" class="btn btn-link @((Model.PageNumber == i) ? "active" : "")">@i</a>
+        }
+
+        @if (Model.PageNumber < Model.TotalPages)
+        {
+            <a href="?PageNumber=@(Model.PageNumber + 1)&Search=@Model.Search" class="btn btn-link">Next</a>
+        }
+    </div>
+
+    ### ✅ Sonuç
+
+    Artık:
+    - `/Index?PageNumber=1` → ilk sayfa
+    - `/Index?PageNumber=3` → 3. sayfa
+    - Search çalışırsa → `/Index?PageNumber=2&Search=Math`
+ *@
+
