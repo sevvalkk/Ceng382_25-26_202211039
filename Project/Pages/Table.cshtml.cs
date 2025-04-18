@@ -56,7 +56,6 @@ namespace Project.Pages
             if (PageNumber <= 0)
                 PageNumber = 1;
 
-            // Apply search filter if search is not null or empty
             var query = Classes.AsQueryable();
             if (!string.IsNullOrEmpty(Search))
             {

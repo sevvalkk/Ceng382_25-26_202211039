@@ -34,14 +34,13 @@
             <div class="col-md-7" style="height:700px; justify-content:center; background: linear-gradient(to right, rgb(76, 154, 200, 0.5), rgb(31, 126, 167)); border-radius:15px; box-shadow: 0 0 10px #000; overflow-y: auto;">
                 <h2 style="font-family: Impact, sans-serif; text-decoration:underline; color:rgb(232, 248, 255);" class="text-center">-Class List-</h2>
                 
-                <form method="get" class="form-inline" style="margin-top:20px; display:flex; justify-content:center;">
+                <form method="get" id="searching" class="form-inline" style="margin-top:20px; display:flex; justify-content:center;">
                     <div class="form-group">
                         <label for="Search" class="mr-2"></label>
                         <input type="text" id="Search" name="Search" class="form-control" placeholder="Class Name" value="@Model.Search" />
-                        <button type="submit" class="btn btn-info ml-2" style="background-color:rgb(28, 108, 143);">Filter</button>
                     </div>
                 </form>
-                
+                                
                 <table class="table table-striped table-hover" style=" margin-top:30px;">
                     <thead>
                         <tr style="font-family: 'Times New Roman', Times, serif; font-size: 18px; color:rgb(232, 248, 255); ">
@@ -147,6 +146,15 @@
         </div>
     </div>
 
+    <script>
+        let timer;
+        const searchInput = document.getElementById('Search');
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { document.getElementById('searching').submit(); }, 1000); 
+        });
+    </script>
 
 
 
@@ -278,12 +286,10 @@ PageNumber: 0, Search: , TotalRecords: 100, TotalPages: 10
             <a href="?PageNumber=@(Model.PageNumber + 1)&Search=@Model.Search" class="btn btn-link">Next</a>
         }
     </div>
-
-    ### ✅ Sonuç
-
     Artık:
     - `/Index?PageNumber=1` → ilk sayfa
     - `/Index?PageNumber=3` → 3. sayfa
     - Search çalışırsa → `/Index?PageNumber=2&Search=Math`
+
  *@
 
