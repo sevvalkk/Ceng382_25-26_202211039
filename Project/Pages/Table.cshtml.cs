@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Project.Helpers;
 using System.Text.Json;
-
+using Project.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Project.Pages
 {
     public class TableModel : PageModel
     {
-    public static List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
+        // public static List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
         private const int PageSize = 10;
 
         [BindProperty(SupportsGet = true)]
@@ -28,17 +29,28 @@ namespace Project.Pages
         [BindProperty(SupportsGet = true)]
         public List<string> SelectedColumns { get; set; } = new List<string>();
         private static DateTime _lastSearchTime = DateTime.MinValue;
-
-
-        public TableModel()
+        private readonly SchoolDbContext _context;
+        private readonly ILogger<TableModel> _logger;
+        public TableModel(ILogger<TableModel> logger)
         {
-            if (!Classes.Any())
-            {
-                SampleClasses();
-            }
+            _logger = logger;
         }
-        
-        public void OnGet(string column)
+        [ActivatorUtilitiesConstructor]
+        public TableModel(SchoolDbContext context, ILogger<TableModel> logger)
+        {
+            _context = context;
+            _logger = logger;
+        }
+        public IList<ClassInformationModel> ClassList { get; set; }
+        // public TableModel()
+        // {
+        //     if (!Classes.Any())
+        //     {
+        //         SampleClasses();
+        //     }
+        // }
+
+        public async Task OnGetAsync(string column)
         {
             if (!string.IsNullOrEmpty(column))
             {
@@ -56,7 +68,52 @@ namespace Project.Pages
             if (PageNumber <= 0)
                 PageNumber = 1;
 
-            var query = Classes.AsQueryable();
+            var query = _context.ClassDB.AsQueryable();
+
+            if (!string.IsNullOrEmpty(Search))
+            {
+                var loweredSearch = Search.ToLower();
+                query = query.Where(c => c.ClassName.ToLower().Contains(loweredSearch));
+            }
+
+            int totalRecords = await query.CountAsync();
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+
+            var pagedClasses = await query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+
+            FilteredClasses = pagedClasses.Select(c => new ClassInformationTable
+            {
+                Id = c.Id,
+                ClassName = c.ClassName,
+                StudentCount = c.StudentCount,
+                Description = c.Description,
+                IsActive = c.IsActive
+            }).ToList();
+        }
+
+
+        public void OnGetToggleColumn(string column)
+        {
+            if (!string.IsNullOrEmpty(column))
+            {
+                var columnsFromQuery = Request.Query["SelectedColumns"].ToString();
+                var currentSelection = columnsFromQuery?.Split(',').ToList() ?? new List<string>();
+
+                if (currentSelection.Contains(column))
+                    currentSelection.Remove(column);
+                else
+                    currentSelection.Add(column);
+
+                SelectedColumns = currentSelection;
+            }
+
+            if (PageNumber <= 0)
+                PageNumber = 1;
+
+            var query = _context.ClassDB.AsQueryable();
             if (!string.IsNullOrEmpty(Search))
             {
                 query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
@@ -73,7 +130,8 @@ namespace Project.Pages
                     Id = c.Id,
                     ClassName = c.ClassName,
                     StudentCount = c.StudentCount,
-                    Description = c.Description
+                    Description = c.Description,
+                    IsActive = c.IsActive
                 })
                 .ToList();
         }
@@ -82,77 +140,84 @@ namespace Project.Pages
 
         public IActionResult OnPostAdd()
         {
-
-            int nextId = Classes.Count > 0 ? Classes.Max(c => c.Id) + 1 : 1;
+            int nextId = _context.ClassDB.Count() > 0 ? _context.ClassDB.Max(c => c.Id) + 1 : 1;
             var newClass = new ClassInformationModel(Class.ClassName, Class.StudentCount, Class.Description)
             {
-                Id = nextId 
+                Id = nextId
             };
 
-            Classes.Add(newClass);
+            _context.ClassDB.Add(newClass);
             return RedirectToPage(new { PageNumber = 1, Search = "" });
         }
 
 
+
         public IActionResult OnPostEdit(int id)
         {
-            var classToEdit = Classes.FirstOrDefault(c => c.Id == id);
+            var classToEdit = _context.ClassDB.FirstOrDefault(c => c.Id == id);
             if (classToEdit != null)
             {
                 Class.Id = classToEdit.Id;
                 Class.ClassName = classToEdit.ClassName;
                 Class.StudentCount = classToEdit.StudentCount;
                 Class.Description = classToEdit.Description;
+                Class.IsActive = classToEdit.IsActive;
             }
             return Page(); 
         }
 
-        public IActionResult OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
-            var classToDelete = Classes.FirstOrDefault(c => c.Id == id);
+            var classToDelete = await _context.ClassDB.FirstOrDefaultAsync(c => c.Id == id);
             if (classToDelete != null)
             {
-                Classes.Remove(classToDelete);
+                classToDelete.IsActive = false;
+                await _context.SaveChangesAsync(); 
             }
 
-            return RedirectToPage(); 
+            return RedirectToPage(new { PageNumber, Search });
         }
-        public IActionResult OnPostUpdate()
+
+        public async Task<IActionResult> OnPostUpdateAsync()
         {
-            var UpdatedClass = Classes.FirstOrDefault(c => c.Id == Class.Id);
-            if (UpdatedClass != null)
+            var updatedClass = await _context.ClassDB.FirstOrDefaultAsync(c => c.Id == Class.Id);
+            if (updatedClass != null)
             {
-                UpdatedClass.ClassName = Class.ClassName;
-                UpdatedClass.StudentCount = Class.StudentCount;
-                UpdatedClass.Description = Class.Description;
+                updatedClass.ClassName = Class.ClassName;
+                updatedClass.StudentCount = Class.StudentCount;
+                updatedClass.Description = Class.Description;
+                updatedClass.IsActive = Class.IsActive;
+
+                await _context.SaveChangesAsync();
             }
 
-            return RedirectToPage(); 
+            return RedirectToPage(new { PageNumber, Search });
         }
-        public List<ClassInformationModel> GetClasses()
-        {
-            return Classes; 
-        }
-        private void SampleClasses()
-        {
-            if (Classes.Count == 0) 
-            {
-                for (int i = 1; i <= 100; i++)
-                {
-                    Classes.Add(new ClassInformationModel
-                    {
-                        Id = i,
-                        ClassName = $"Class {i}",
-                        StudentCount = 10 + i,
-                        Description = $"Description for Class {i}"
-                    });
-                }
-            }
-        }
+
+        // public List<ClassInformationModel> GetClasses()
+        // {
+        //     return Classes; 
+        // }
+        // private void SampleClasses()
+        // {
+        //     if (Classes.Count == 0) 
+        //     {
+        //         for (int i = 1; i <= 100; i++)
+        //         {
+        //             Classes.Add(new ClassInformationModel
+        //             {
+        //                 Id = i,
+        //                 ClassName = $"Class {i}",
+        //                 StudentCount = 10 + i,
+        //                 Description = $"Description for Class {i}"
+        //             });
+        //         }
+        //     }
+        // }
         
         public IActionResult OnPostExportJson(string Search, int PageNumber, List<string> SelectedColumns)
         {
-            var query = Classes.AsQueryable();
+            var query = _context.ClassDB.AsQueryable();
 
             if (!string.IsNullOrEmpty(Search))
             {
@@ -167,7 +232,9 @@ namespace Project.Pages
                     Id = c.Id,
                     ClassName = c.ClassName,
                     StudentCount = c.StudentCount,
-                    Description = c.Description
+                    Description = c.Description,
+                    IsActive = c.IsActive
+
                 })
                 .ToList();
 
@@ -183,6 +250,8 @@ namespace Project.Pages
 
             return RedirectToPage(new { ExportedFilePath = exportFilePath });
         }
+
+        
 
     }
 }
@@ -398,5 +467,20 @@ public IActionResult OnPostLogout()
 ---
 
 Would you like a sample `Login.cshtml` page layout too?
+
+
+
+
+PROMPT__________________________
+
+RESPONSE______________________
+
+
+
+
+
+
+
+
 
 */

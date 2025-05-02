@@ -5,6 +5,7 @@ namespace Project.Models
 {
     public class ClassInformationTable 
     {
+        [Key]
         public int Id { get;  set; }
 
         public string ClassName { get; set; }
@@ -12,6 +13,8 @@ namespace Project.Models
         public int StudentCount { get; set; }
 
         public string Description { get; set; }
-
+        
+        [Required]
+        public bool IsActive { get; set; }
     }
 }

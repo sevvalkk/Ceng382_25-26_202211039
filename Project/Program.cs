@@ -1,3 +1,9 @@
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Project.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,6 +15,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; 
 });
 
+
+builder.Services.AddDbContext<SchoolDbContext>(options =>
+ options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolDbConnection")));
+
 var app = builder.Build();
 
 // if (!app.Environment.IsDevelopment())
@@ -17,7 +27,7 @@ var app = builder.Build();
 //     app.UseHsts();
 // }
 
-
+app.UseStaticFiles();
 app.UseSession();
 
 app.UseHttpsRedirection();
@@ -26,9 +36,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-app.MapRazorPages()
-   .WithStaticAssets();
+// app.MapStaticAssets();
+app.MapRazorPages();
+//    .WithStaticAssets();
 
 
 app.Run();

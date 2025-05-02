@@ -1,0 +1,14 @@
+[
+  {
+    "Id": 10,
+    "ClassName": "Class 10",
+    "StudentCount": 20,
+    "Description": "Description for Class 10"
+  },
+  {
+    "Id": 100,
+    "ClassName": "Class 100",
+    "StudentCount": 110,
+    "Description": "Description for Class 100"
+  }
+]

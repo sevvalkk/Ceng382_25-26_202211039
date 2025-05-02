@@ -23,6 +23,10 @@
                         <label for="Description" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Description</label>
                         <textarea id="Description" asp-for="Class.Description" class="form-control" style="max-height: 200px;" required></textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="IsActive" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Active</label>
+                        <textarea id="IsActive" asp-for="Class.IsActive" class="form-control" style="max-height: 200px;" required></textarea>
+                    </div>
                     <div style="display:flex; justify-content:center; margin-top:50px;">
                         <button type="submit" class="btn btn-success" asp-page-handler="Add" style="font-size: 15px;">Add Class</button>
                         <button type="submit" class="btn btn-warning" asp-page-handler="Update" style="font-size: 15px">Update</button>
@@ -45,7 +49,7 @@
                     <thead>
                         <tr style="font-family: 'Times New Roman', Times, serif; font-size: 18px; color:rgb(232, 248, 255); ">
                             <th>
-                                <form method="get">
+                                <form method="get" asp-page-handler="ToggleColumn">
                                     <input type="hidden" name="Search" value="@Model.Search" />
                                     <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
                                     <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
@@ -53,7 +57,7 @@
                                 </form>
                             </th>
                             <th>
-                                <form method="get">
+                                <form method="get" asp-page-handler="ToggleColumn">
                                     <input type="hidden" name="Search" value="@Model.Search" />
                                     <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
                                     <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
@@ -61,11 +65,19 @@
                                 </form>
                             </th>
                             <th>
-                                <form method="get">
+                                <form method="get" asp-page-handler="ToggleColumn">
                                     <input type="hidden" name="Search" value="@Model.Search" />
                                     <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
                                     <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
                                     <button name="column" value="Description" class="btn @((Model.SelectedColumns.Contains("Description") ? "btn-info" : "btn-outline-light"))">Description</button>
+                                </form>
+                            </th>
+                            <th>
+                                <form method="get" asp-page-handler="ToggleColumn">
+                                    <input type="hidden" name="Search" value="@Model.Search" />
+                                    <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+                                    <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
+                                    <button name="column" value="IsActive" class="btn @((Model.SelectedColumns.Contains("IsActive") ? "btn-info" : "btn-outline-light"))">Active</button>
                                 </form>
                             </th>
                             <th>Actions</th>
@@ -81,6 +93,8 @@
                                     <td>@c.ClassName</td>
                                     <td>@c.StudentCount</td>
                                     <td>@c.Description</td>
+                                    <td>@(c.IsActive ? "Yes" : "No")</td>
+
                                     <td>
                                         <div>
                                             <form method="post">
