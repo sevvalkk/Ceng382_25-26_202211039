@@ -88,7 +88,7 @@ namespace Project.Pages
             {
                 Id = c.Id,
                 ClassName = c.ClassName,
-                StudentCount = c.StudentCount,
+                PersonCount = c.PersonCount,
                 Description = c.Description,
                 IsActive = c.IsActive
             }).ToList();
@@ -129,7 +129,7 @@ namespace Project.Pages
                 {
                     Id = c.Id,
                     ClassName = c.ClassName,
-                    StudentCount = c.StudentCount,
+                    PersonCount = c.PersonCount,
                     Description = c.Description,
                     IsActive = c.IsActive
                 })
@@ -141,7 +141,7 @@ namespace Project.Pages
         public IActionResult OnPostAdd()
         {
             int nextId = _context.ClassDB.Count() > 0 ? _context.ClassDB.Max(c => c.Id) + 1 : 1;
-            var newClass = new ClassInformationModel(Class.ClassName, Class.StudentCount, Class.Description)
+            var newClass = new ClassInformationModel(Class.ClassName, Class.PersonCount, Class.Description)
             {
                 Id = nextId
             };
@@ -159,7 +159,7 @@ namespace Project.Pages
             {
                 Class.Id = classToEdit.Id;
                 Class.ClassName = classToEdit.ClassName;
-                Class.StudentCount = classToEdit.StudentCount;
+                Class.PersonCount = classToEdit.PersonCount;
                 Class.Description = classToEdit.Description;
                 Class.IsActive = classToEdit.IsActive;
             }
@@ -184,7 +184,7 @@ namespace Project.Pages
             if (updatedClass != null)
             {
                 updatedClass.ClassName = Class.ClassName;
-                updatedClass.StudentCount = Class.StudentCount;
+                updatedClass.PersonCount = Class.PersonCount;
                 updatedClass.Description = Class.Description;
                 updatedClass.IsActive = Class.IsActive;
 
@@ -208,7 +208,7 @@ namespace Project.Pages
         //             {
         //                 Id = i,
         //                 ClassName = $"Class {i}",
-        //                 StudentCount = 10 + i,
+        //                 PersonCount = 10 + i,
         //                 Description = $"Description for Class {i}"
         //             });
         //         }
@@ -231,7 +231,7 @@ namespace Project.Pages
                 {
                     Id = c.Id,
                     ClassName = c.ClassName,
-                    StudentCount = c.StudentCount,
+                    PersonCount = c.PersonCount,
                     Description = c.Description,
                     IsActive = c.IsActive
 
@@ -240,7 +240,7 @@ namespace Project.Pages
 
             if (SelectedColumns == null || !SelectedColumns.Any())
             {
-                SelectedColumns = new List<string> { "Id", "ClassName", "StudentCount", "Description" };
+                SelectedColumns = new List<string> { "Id", "ClassName", "PersonCount", "Description" };
             }
 
             string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json",

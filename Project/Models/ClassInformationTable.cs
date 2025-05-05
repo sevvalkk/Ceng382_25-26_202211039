@@ -10,7 +10,7 @@ namespace Project.Models
 
         public string ClassName { get; set; }
 
-        public int StudentCount { get; set; }
+        public int PersonCount { get; set; }
 
         public string Description { get; set; }
         

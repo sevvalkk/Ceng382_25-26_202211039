@@ -15,8 +15,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="StudentCount" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Student Count</label>
-                        <input type="number" id="StudentCount" asp-for="Class.StudentCount" class="form-control" required />
+                        <label for="PersonCount" style="font-weight: bold; font-family: 'Times New Roman', Times, serif; font-size: 20px; color:rgb(232, 248, 255);">Student Count</label>
+                        <input type="number" id="PersonCount" asp-for="Class.PersonCount" class="form-control" required />
                     </div>
 
                     <div class="form-group">
@@ -61,7 +61,7 @@
                                     <input type="hidden" name="Search" value="@Model.Search" />
                                     <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
                                     <input type="hidden" name="SelectedColumns" value="@string.Join(",", Model.SelectedColumns)" />
-                                    <button name="column" value="StudentCount" class="btn @((Model.SelectedColumns.Contains("StudentCount") ? "btn-info" : "btn-outline-light"))">Student Count</button>
+                                    <button name="column" value="PersonCount" class="btn @((Model.SelectedColumns.Contains("PersonCount") ? "btn-info" : "btn-outline-light"))">Student Count</button>
                                 </form>
                             </th>
                             <th>
@@ -91,7 +91,7 @@
                             {
                                 <tr style="color:rgb(232, 248, 255);">
                                     <td>@c.ClassName</td>
-                                    <td>@c.StudentCount</td>
+                                    <td>@c.PersonCount</td>
                                     <td>@c.Description</td>
                                     <td>@(c.IsActive ? "Yes" : "No")</td>
 
@@ -202,7 +202,7 @@ PageNumber: 0, Search: , TotalRecords: 100, TotalPages: 10
                 {
                     Id = c.Id,
                     ClassName = c.ClassName,
-                    StudentCount = c.StudentCount,
+                    PersonCount = c.PersonCount,
                     Description = c.Description
                 })
                 .ToList();
@@ -268,7 +268,7 @@ PageNumber: 0, Search: , TotalRecords: 100, TotalPages: 10
             {
                 Id = c.Id,
                 ClassName = c.ClassName,
-                StudentCount = c.StudentCount,
+                PersonCount = c.PersonCount,
                 Description = c.Description
             })
             .ToList();

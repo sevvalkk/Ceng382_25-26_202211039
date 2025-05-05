@@ -12,7 +12,7 @@ namespace Project.Models
         public string ClassName { get; set; }
 
         [Required(ErrorMessage = "Student count is required!")]
-        public int StudentCount { get; set; }
+        public int PersonCount { get; set; }
 
         [StringLength(300, ErrorMessage = "Description can't be longer than 300 characters.")]
         public string? Description { get; set; }
@@ -21,10 +21,10 @@ namespace Project.Models
         {
         }
 
-        public ClassInformationModel(string className, int studentCount, string description) 
+        public ClassInformationModel(string className, int personCount, string description) 
         {
             ClassName = className;
-            StudentCount = studentCount;
+            PersonCount = personCount;
             Description = description;
         }
     }
