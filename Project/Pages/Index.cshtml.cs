@@ -1,15 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Project.Models;
-using System.Collections.Generic;
-using System.Linq;
-using Project.Helpers;
-using System.Text.Json;
+using Project.Data;
 
 namespace Project.Pages
 {
     public class IndexModel : PageModel
     {
+        private readonly SchoolDbContext _context;
+
+        public IndexModel(SchoolDbContext context)
+        {
+            _context = context;
+        }
 
         [BindProperty]
         public string Username { get; set; }
@@ -19,24 +23,21 @@ namespace Project.Pages
 
         public string ErrorMessage { get; set; }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "users.json");
-            var users = JsonSerializer.Deserialize<List<User>>(System.IO.File.ReadAllText(filePath));
-
-            var user = users.FirstOrDefault(u => u.Username == Username && u.Password == Password && u.IsActive);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == Username && u.Password == Password && u.IsActive);
 
             if (user != null)
             {
                 var token = Guid.NewGuid().ToString();
                 var sessionId = HttpContext.Session.Id;
 
-                // Set session
                 HttpContext.Session.SetString("username", user.Username);
+                HttpContext.Session.SetString("role", user.Role);
                 HttpContext.Session.SetString("token", token);
                 HttpContext.Session.SetString("session_id", sessionId);
 
-                // Set cookie
                 CookieOptions options = new CookieOptions
                 {
                     Expires = DateTime.Now.AddMinutes(30),
@@ -49,7 +50,7 @@ namespace Project.Pages
                 Response.Cookies.Append("token", token, options);
                 Response.Cookies.Append("session_id", sessionId, options);
 
-                return RedirectToPage("/Table"); // redirect to class table page
+                return RedirectToPage("/Table");
             }
 
             ErrorMessage = "Username or password is incorrect.";
@@ -73,7 +74,6 @@ namespace Project.Pages
                 TempData["Error"] = "Unauthorized access.";
             }
 
-            // Proceed with page logic
             return Page();
         }
 
@@ -87,11 +87,9 @@ namespace Project.Pages
 
             return RedirectToPage("/Index");
         }
-
-
     }
-    
 }
+
 
 
 /*

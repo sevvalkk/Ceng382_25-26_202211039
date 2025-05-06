@@ -13,5 +13,7 @@ namespace Project.Data{
         }
 
         public DbSet<ClassInformationModel> ClassDB { get; set; }
+        public DbSet<User> Users { get; set; }
+
     }
 }

@@ -267,7 +267,6 @@ C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Deb
 C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Debug\net9.0\scopedcss\bundle\Project.styles.css
 C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Debug\net9.0\scopedcss\projectbundle\Project.bundle.scp.css
 C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Debug\net9.0\compressed\ydb8vxti1i-c2tiyv64ts.gz
-C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Debug\net9.0\compressed\165maaubqc-lt03k151zs.gz
 C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Debug\net9.0\compressed\ir86nxngkb-61n19gt1b8.gz
 C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Debug\net9.0\compressed\pny6gljfzy-xtxxf3hu2r.gz
 C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\obj\Debug\net9.0\compressed\h5kjrugxa6-agp80tu62r.gz
