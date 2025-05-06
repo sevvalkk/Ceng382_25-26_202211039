@@ -68,7 +68,9 @@ namespace Project.Pages
             if (PageNumber <= 0)
                 PageNumber = 1;
 
-            var query = _context.ClassDB.AsQueryable();
+            var query = _context.ClassDB
+                .Where(c => c.IsActive)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(Search))
             {
@@ -113,7 +115,11 @@ namespace Project.Pages
             if (PageNumber <= 0)
                 PageNumber = 1;
 
-            var query = _context.ClassDB.AsQueryable();
+            
+            var query = _context.ClassDB
+                .Where(c => c.IsActive)
+                .AsQueryable();
+
             if (!string.IsNullOrEmpty(Search))
             {
                 query = query.Where(c => c.ClassName.Contains(Search, StringComparison.OrdinalIgnoreCase));
@@ -208,7 +214,7 @@ namespace Project.Pages
         //             {
         //                 Id = i,
         //                 ClassName = $"Class {i}",
-        //                 PersonCount = 10 + i,
+        //                 StudentCount = 10 + i,
         //                 Description = $"Description for Class {i}"
         //             });
         //         }
@@ -217,7 +223,10 @@ namespace Project.Pages
         
         public IActionResult OnPostExportJson(string Search, int PageNumber, List<string> SelectedColumns)
         {
-            var query = _context.ClassDB.AsQueryable();
+
+            var query = _context.ClassDB
+                .Where(c => c.IsActive)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(Search))
             {
@@ -240,7 +249,7 @@ namespace Project.Pages
 
             if (SelectedColumns == null || !SelectedColumns.Any())
             {
-                SelectedColumns = new List<string> { "Id", "ClassName", "PersonCount", "Description" };
+                SelectedColumns = new List<string> { "Id", "ClassName", "StudentCount", "Description" };
             }
 
             string exportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Exports", "Json",
@@ -250,7 +259,6 @@ namespace Project.Pages
 
             return RedirectToPage(new { ExportedFilePath = exportFilePath });
         }
-
         
 
     }
