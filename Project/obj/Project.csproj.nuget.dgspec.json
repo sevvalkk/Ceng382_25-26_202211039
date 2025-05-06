@@ -51,21 +51,29 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.0-preview.7.24406.2, )"
+            },
+            "Microsoft.AspNetCore.Identity.UI": {
+              "target": "Package",
+              "version": "[9.0.0-preview.7.24406.2, )"
+            },
             "Microsoft.EntityFrameworkCore.Design": {
               "target": "Package",
-              "version": "[9.0.0-preview.7.24378.1, )"
+              "version": "[9.0.0-preview.7.24405.3, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.0-preview.7.24378.1, )"
+              "version": "[9.0.0-preview.7.24405.3, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "target": "Package",
-              "version": "[9.0.0-preview.7.24378.1, )"
+              "version": "[9.0.0-preview.7.24405.3, )"
             },
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
-              "version": "[9.0.0-preview.7.24378.6, )"
+              "version": "[9.0.0-preview.7.24413.1, )"
             }
           },
           "imports": [

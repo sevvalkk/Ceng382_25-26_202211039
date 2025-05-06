@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Project.Models;
 using Project.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project.Pages
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly SchoolDbContext _context;

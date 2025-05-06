@@ -7,9 +7,11 @@ using Project.Helpers;
 using System.Text.Json;
 using Project.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project.Pages
 {
+    [Authorize]
     public class TableModel : PageModel
     {
         // public static List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
@@ -143,22 +145,47 @@ namespace Project.Pages
         }
         
 
-
         public IActionResult OnPostAdd()
         {
-            int nextId = _context.ClassDB.Count() > 0 ? _context.ClassDB.Max(c => c.Id) + 1 : 1;
-            var newClass = new ClassInformationModel(Class.ClassName, Class.PersonCount, Class.Description)
+            string newIdValue;
+            if (_context.ClassDB.Any())
             {
-                Id = nextId
+                int maxNumericId = 0;
+                var ids = _context.ClassDB.Select(c => c.Id).ToList(); 
+                foreach (var idStr in ids)
+                {
+                    if (int.TryParse(idStr, out int numericId))
+                    {
+                        if (numericId > maxNumericId)
+                        {
+                            maxNumericId = numericId;
+                        }
+                    }
+                }
+                newIdValue = (maxNumericId + 1).ToString();
+            }
+            else
+            {
+                newIdValue = "1";
+            }
+
+            var newClass = new ClassInformationModel
+            {
+                Id = newIdValue,
+                ClassName = Class.ClassName,
+                PersonCount = Class.PersonCount,
+                Description = Class.Description,
+                IsActive = true 
             };
 
             _context.ClassDB.Add(newClass);
+            _context.SaveChanges(); 
+
             return RedirectToPage(new { PageNumber = 1, Search = "" });
         }
 
 
-
-        public IActionResult OnPostEdit(int id)
+        public IActionResult OnPostEdit(string id)
         {
             var classToEdit = _context.ClassDB.FirstOrDefault(c => c.Id == id);
             if (classToEdit != null)
@@ -172,7 +199,7 @@ namespace Project.Pages
             return Page(); 
         }
 
-        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        public async Task<IActionResult> OnPostDeleteAsync(string id)
         {
             var classToDelete = await _context.ClassDB.FirstOrDefaultAsync(c => c.Id == id);
             if (classToDelete != null)
@@ -480,11 +507,66 @@ Would you like a sample `Login.cshtml` page layout too?
 
 
 PROMPT__________________________
+C:\Users\sevva\Desktop\ceng382webproject\Ceng382_25-26_202211039\Project\Pages\Table.cshtml.cs(151,98): error CS0029: Cannot implicitly convert type 'int' to 'string'
 
+
+        public IActionResult OnPostAdd()
+        {
+            string nextId = _context.ClassDB.Count() > 0 ? _context.ClassDB.Max(c => c.Id) + 1 : 1;
+            var newClass = new ClassInformationModel(Class.ClassName, Class.PersonCount, Class.Description)
+            {
+                Id = nextId
+            };
+
+            _context.ClassDB.Add(newClass);
+            return RedirectToPage(new { PageNumber = 1, Search = "" });
+        }
 RESPONSE______________________
 
+The error CS0029: Cannot implicitly convert type 'int' to 'string' occurs because your code is trying to assign an integer value to a string type without explicit conversion. This happens in the line where nextId is calculated, specifically in the else part of the ternary operator (: 1), and potentially in the Id = nextId assignment if nextId ended up being an integer. Additionally, the way you calculate the maximum ID for string-based numeric IDs is incorrect, and the instantiation of ClassInformationModel needs to use property initializers as no matching constructor exists. You also need to call _context.SaveChanges() to persist the new entity.
 
+Here's the corrected OnPostAdd method:
+// ...existing code...
+        public IActionResult OnPostAdd()
+        {
+            string newIdValue;
+            if (_context.ClassDB.Any())
+            {
+                int maxNumericId = 0;
+                var ids = _context.ClassDB.Select(c => c.Id).ToList(); // Get all string IDs
+                foreach (var idStr in ids)
+                {
+                    if (int.TryParse(idStr, out int numericId))
+                    {
+                        if (numericId > maxNumericId)
+                        {
+                            maxNumericId = numericId;
+                        }
+                    }
+                    // Optionally, you could log a warning or handle cases where an Id is not a parseable integer.
+                }
+                newIdValue = (maxNumericId + 1).ToString();
+            }
+            else
+            {
+                newIdValue = "1"; // Start with "1" if no classes exist
+            }
 
+            var newClass = new ClassInformationModel
+            {
+                Id = newIdValue,
+                ClassName = Class.ClassName,
+                PersonCount = Class.PersonCount,
+                Description = Class.Description,
+                IsActive = true // Assuming new classes should be active by default
+            };
+
+            _context.ClassDB.Add(newClass);
+            _context.SaveChanges(); // Persist changes to the database
+
+            return RedirectToPage(new { PageNumber = 1, Search = "" });
+        }
+// ...existing code...
 
 
 

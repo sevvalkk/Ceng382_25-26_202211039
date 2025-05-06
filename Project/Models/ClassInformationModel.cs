@@ -7,7 +7,7 @@ namespace Project.Models
     public class ClassInformationModel
     {
         [Key]
-        public int Id { get;  set; }
+        public string Id { get;  set; }
         [Required(ErrorMessage = "Class name is required!")]
         public string ClassName { get; set; }
 
