@@ -147,11 +147,23 @@ namespace Project.Pages
 
         public IActionResult OnPostAdd()
         {
+            var UserName = HttpContext.Session.GetString("UserName");
+            if (string.IsNullOrEmpty(UserName))
+            {
+                return RedirectToPage("/Index");
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.UserName == UserName && u.IsActive);
+            if (user == null)
+            {
+                return RedirectToPage("/Index");
+            }
+
             string newIdValue;
             if (_context.ClassDB.Any())
             {
                 int maxNumericId = 0;
-                var ids = _context.ClassDB.Select(c => c.Id).ToList(); 
+                var ids = _context.ClassDB.Select(c => c.Id).ToList();
                 foreach (var idStr in ids)
                 {
                     if (int.TryParse(idStr, out int numericId))
@@ -175,11 +187,11 @@ namespace Project.Pages
                 ClassName = Class.ClassName,
                 PersonCount = Class.PersonCount,
                 Description = Class.Description,
-                IsActive = true 
+                IsActive = true,
             };
 
             _context.ClassDB.Add(newClass);
-            _context.SaveChanges(); 
+            _context.SaveChanges();
 
             return RedirectToPage(new { PageNumber = 1, Search = "" });
         }
@@ -199,6 +211,7 @@ namespace Project.Pages
             return Page(); 
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> OnPostDeleteAsync(string id)
         {
             var classToDelete = await _context.ClassDB.FirstOrDefaultAsync(c => c.Id == id);
@@ -309,7 +322,7 @@ o Below is the UML representation of the User class:
 +--------------------+
 | User |
 +--------------------+
-| - Username : string|
+| - UserName : string|
 | - Password : string|
 | - Role : string|
 | - IsActive : bool |
@@ -322,7 +335,7 @@ Session and Cookies
 o Upon successful login:
 ▪ Generate a simple token
 ▪ Store the following in the session:
-▪ username
+▪ UserName
 ▪ token
 ▪ session_id (use HttpContext.Session.Id)
 ▪ Store the same values in cookies using the following cookie settings:
@@ -331,11 +344,11 @@ o Upon successful login:
 ▪ Secure = true
 ▪ SameSite = Strict
 Access Control
-o On all protected pages, check whether the token, username, and session_id from
+o On all protected pages, check whether the token, UserName, and session_id from
 cookies match those in the session.
-o If both token and username values match between the session and cookie, then
+o If both token and UserName values match between the session and cookie, then
 you may consider the login valid.
-o If the check fails, use errors and warnings to say “username or password is
+o If the check fails, use errors and warnings to say “UserName or password is
 incorrect.” Or something like this message.
 Logout
 o Create a logout button that clears the session and removes all cookies related to
@@ -358,7 +371,7 @@ namespace Project.Models
 {
     public class User
     {
-        public string Username { get; set; }
+        public string UserName { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }
         public bool IsActive { get; set; }
@@ -373,14 +386,14 @@ namespace Project.Models
 ```json
 [
   {
-    "Username": "admin",
+    "UserName": "admin",
     "Password": "admin123",
     "Role": "Admin",
     "IsActive": true,
     "CreatedAt": "2024-10-01T00:00:00"
   },
   {
-    "Username": "instructor",
+    "UserName": "instructor",
     "Password": "pass456",
     "Role": "Instructor",
     "IsActive": true,
@@ -406,7 +419,7 @@ using System;
 public class LoginModel : PageModel
 {
     [BindProperty]
-    public string Username { get; set; }
+    public string UserName { get; set; }
 
     [BindProperty]
     public string Password { get; set; }
@@ -418,7 +431,7 @@ public class LoginModel : PageModel
         string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "users.json");
         var users = JsonSerializer.Deserialize<List<User>>(System.IO.File.ReadAllText(filePath));
 
-        var user = users.FirstOrDefault(u => u.Username == Username && u.Password == Password && u.IsActive);
+        var user = users.FirstOrDefault(u => u.UserName == UserName && u.Password == Password && u.IsActive);
 
         if (user != null)
         {
@@ -426,7 +439,7 @@ public class LoginModel : PageModel
             var sessionId = HttpContext.Session.Id;
 
             // Set session
-            HttpContext.Session.SetString("username", user.Username);
+            HttpContext.Session.SetString("UserName", user.UserName);
             HttpContext.Session.SetString("token", token);
             HttpContext.Session.SetString("session_id", sessionId);
 
@@ -439,14 +452,14 @@ public class LoginModel : PageModel
                 SameSite = SameSiteMode.Strict
             };
 
-            Response.Cookies.Append("username", user.Username, options);
+            Response.Cookies.Append("UserName", user.UserName, options);
             Response.Cookies.Append("token", token, options);
             Response.Cookies.Append("session_id", sessionId, options);
 
             return RedirectToPage("/Index"); // redirect to class table page
         }
 
-        ErrorMessage = "Username or password is incorrect.";
+        ErrorMessage = "UserName or password is incorrect.";
         return Page();
     }
 }
@@ -460,17 +473,17 @@ Add this check to `OnGet()` or `OnGetAsync()` of protected pages:
 ```csharp
 public IActionResult OnGet()
 {
-    string sessionUsername = HttpContext.Session.GetString("username");
+    string sessionUserName = HttpContext.Session.GetString("UserName");
     string sessionToken = HttpContext.Session.GetString("token");
     string sessionId = HttpContext.Session.GetString("session_id");
 
-    string cookieUsername = Request.Cookies["username"];
+    string cookieUserName = Request.Cookies["UserName"];
     string cookieToken = Request.Cookies["token"];
     string cookieSessionId = Request.Cookies["session_id"];
 
-    if (sessionUsername == null || sessionToken == null || sessionId == null ||
-        cookieUsername == null || cookieToken == null || cookieSessionId == null ||
-        sessionUsername != cookieUsername || sessionToken != cookieToken || sessionId != cookieSessionId)
+    if (sessionUserName == null || sessionToken == null || sessionId == null ||
+        cookieUserName == null || cookieToken == null || cookieSessionId == null ||
+        sessionUserName != cookieUserName || sessionToken != cookieToken || sessionId != cookieSessionId)
     {
         TempData["Error"] = "Unauthorized access.";
         return RedirectToPage("/Login");
@@ -491,7 +504,7 @@ public IActionResult OnPostLogout()
 {
     HttpContext.Session.Clear();
 
-    Response.Cookies.Delete("username");
+    Response.Cookies.Delete("UserName");
     Response.Cookies.Delete("token");
     Response.Cookies.Delete("session_id");
 

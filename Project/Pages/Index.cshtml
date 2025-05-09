@@ -1,38 +1,44 @@
-﻿@page
+﻿
+@page
 @model Project.Pages.IndexModel
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="text-center mb-4" style="font-family: Impact; color:white;">LOGIN</h2>
-
-            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-            {
-                <div class="alert alert-danger">@Model.ErrorMessage</div>
-            }
-
-            <form method="post">
-                <div class="form-group">
-                    <label asp-for="Username" style="font-family: Impact; color:white;">Username</label>
-                    <input asp-for="Username" class="form-control" />
-                    <span asp-validation-for="Username" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mt-3">
-                    <label asp-for="Password" style="font-family: Impact; color:white;">Password</label>
-                    <input asp-for="Password" class="form-control" type="password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary mt-4 w-100" style="font-family: Impact; color:white;">Login</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+@{
+    // Example: redirect to login if not authenticated
+    var isAuthenticated = HttpContext.Session.GetString("UserName") != null;
+    if (!isAuthenticated)
+    {
+        Response.Redirect("/Login");
+    }
 }
 
 
+@* 
 
+@using Project
+@using Microsoft.AspNetCore.Identity
+@model Project.Pages.IndexModel
+
+@inject SignInManager<Project.Models.User> SignInManager
+@inject UserManager<Project.Models.User> UserManager
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        <a id="manage" class="nav-link text-dark" asp-page="/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+    </li>
+    <li class="nav-item">
+        <form id="logoutForm" class="form-inline" asp-page="/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+            <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" id="login" asp-page="/Login">Login</a>
+    </li>
+}
+</ul>
+
+ *@
