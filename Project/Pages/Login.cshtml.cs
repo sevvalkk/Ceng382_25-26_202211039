@@ -31,11 +31,46 @@ namespace Project.Pages
             if (user != null && await _userManager.CheckPasswordAsync(user, Password))
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
+                var token = Guid.NewGuid().ToString();
+                var sessionId = HttpContext.Session.Id;
                 HttpContext.Session.SetString("UserName", user.UserName);
+                HttpContext.Session.SetString("role", user.Role);
+                HttpContext.Session.SetString("token", token);
+                HttpContext.Session.SetString("session_id", sessionId);
+                CookieOptions options = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddMinutes(30),
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                };
+                Response.Cookies.Append("username", user.UserName, options);
+                Response.Cookies.Append("token", token, options);
+                Response.Cookies.Append("session_id", sessionId, options);
                 return RedirectToPage("/Table");
             }
 
             ErrorMessage = "Username or password is incorrect.";
+            return Page();
+        }
+
+        public IActionResult OnGet()
+        {
+            string sessionUsername = HttpContext.Session.GetString("username");
+            string sessionToken = HttpContext.Session.GetString("token");
+            string sessionId = HttpContext.Session.GetString("session_id");
+
+            string cookieUsername = Request.Cookies["username"];
+            string cookieToken = Request.Cookies["token"];
+            string cookieSessionId = Request.Cookies["session_id"];
+
+            if (sessionUsername == null || sessionToken == null || sessionId == null ||
+                cookieUsername == null || cookieToken == null || cookieSessionId == null ||
+                sessionUsername != cookieUsername || sessionToken != cookieToken || sessionId != cookieSessionId)
+            {
+                TempData["Error"] = "Unauthorized access.";
+            }
+
             return Page();
         }
     }
